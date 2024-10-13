@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "401196002201",
+    "project_id": "luchmate",
+    "storage_bucket": "luchmate.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:401196002201:android:492e68707961615ffbc108",
+        "android_client_info": {
+          "package_name": "com.example.lunchmate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAB-h7hng6HsPXvn8nQf9kg-FPsOKHV7y0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
