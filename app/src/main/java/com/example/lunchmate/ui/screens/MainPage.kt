@@ -2,8 +2,10 @@ package com.example.lunchmate.ui.screens
 
 import BottomNavBar
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
@@ -14,23 +16,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.firestore.FirebaseFirestore
+
 @Composable
 fun MainPage(navController: NavController, username: String) {
-    var location by remember { mutableStateOf("Karlskrona") } // Default location
-    var events by remember { mutableStateOf(listOf<Map<String, String>>()) } // Events for the location
-    var expanded by remember { mutableStateOf(false) } // State for DropdownMenu
-    val locations = listOf("Karlskrona", "Stockholm", "Malmö", "Gothenburg") // Predefined locations
+    var location by remember { mutableStateOf("Karlskrona") }
+    var events by remember { mutableStateOf(listOf<Map<String, String>>()) }
+    var expanded by remember { mutableStateOf(false) }
+    val locations = listOf("Karlskrona", "Stockholm", "Malmö", "Gothenburg")
 
     // Fetch the location and events from Firestore
     LaunchedEffect(Unit) {
         val db = FirebaseFirestore.getInstance()
         val userRef = db.collection("users").document(username)
 
-        // Fetch user location
         userRef.get().addOnSuccessListener { document ->
             if (document != null && document.exists()) {
                 location = document.getString("location") ?: "Karlskrona"
-                // Fetch events based on the location
+
                 fetchEventsForLocation(location) { eventList ->
                     events = eventList
                 }
@@ -57,19 +59,17 @@ fun MainPage(navController: NavController, username: String) {
             }
     }
 
-    // Main Page UI
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Scrollable content
         Column(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f).padding(16.dp)
         ) {
             Text(
                 text = "Where do you want to eat today in $location?",
                 style = MaterialTheme.typography.displayMedium,
-                color = Color.White // Change text color to white
+                color = Color.White
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -77,7 +77,7 @@ fun MainPage(navController: NavController, username: String) {
             // Display Dropdown for selecting location
             TextField(
                 value = location,
-                onValueChange = {}, // Prevent direct editing
+                onValueChange = {},
                 label = { Text("Select Location") },
                 trailingIcon = {
                     Icon(
@@ -86,10 +86,9 @@ fun MainPage(navController: NavController, username: String) {
                         modifier = Modifier.clickable { expanded = !expanded }
                     )
                 },
-                readOnly = true // Keep it read-only
+                readOnly = true // Disable editing
             )
 
-            // Show DropdownMenu
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
@@ -98,8 +97,8 @@ fun MainPage(navController: NavController, username: String) {
                     DropdownMenuItem(
                         text = { Text(loc) },
                         onClick = {
-                            updateLocation(loc) // Update location in Firestore
-                            expanded = false // Close dropdown after selection
+                            updateLocation(loc)
+                            expanded = false
                         }
                     )
                 }
@@ -110,26 +109,44 @@ fun MainPage(navController: NavController, username: String) {
             // Show events for the selected location
             if (events.isNotEmpty()) {
                 Text(text = "Lunch Events in $location:", color = Color.White)
-                events.forEach { event ->
-                    // Ensure safe access to map values
-                    val eventTitle = event["title"] ?: "Untitled Event"
-                    val eventDescription = event["description"] ?: "No description available"
-                    val restaurantName = event["restaurant"] ?: "Unknown Restaurant"
 
-                    Column(modifier = Modifier.padding(8.dp)) {
-                        Text(text = eventTitle, style = MaterialTheme.typography.titleLarge, color = Color.White)
-                        Text(text = eventDescription, color = Color.White)
-                        Text(text = "Restaurant: $restaurantName", color = Color.White)
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    events.forEach { event ->
+                        // Ensure safe access to map values
+                        val eventTitle = event["title"] ?: "Untitled Event"
+                        val eventDescription = event["Description"] ?: "No description available"
+                        val restaurantName = event["Restaurantname"] ?: "Unknown Restaurant"
 
-                        // Button to join the event
-                        Button(onClick = {
-                            // Navigate to the event page (You can pass event details if necessary)
-                            navController.navigate("event_page")
-                        }) {
-                            Text(text = "Join Event")
+                        // Card layout for each event
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1F1F1F)) // Darker background for card
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(text = eventTitle, style = MaterialTheme.typography.titleLarge, color = Color.White)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(text = eventDescription, color = Color.White)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(text = "Restaurant: $restaurantName", color = Color.White)
+
+                                // Button to join the event
+                                Button(
+                                    onClick = {
+                                        navController.navigate("event_page")
+                                    },
+                                    modifier = Modifier.align(Alignment.End)
+                                ) {
+                                    Text(text = "Join Event")
+                                }
+                            }
                         }
-
-                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             } else {
@@ -137,18 +154,6 @@ fun MainPage(navController: NavController, username: String) {
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Button to create new lunch event
-            Button(onClick = { navController.navigate("create_lunch_event") }) {
-                Text(text = "Create Lunch Event")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Button to view all events
-            Button(onClick = { navController.navigate("view_lunch_events") }) {
-                Text(text = "View All Lunch Events")
-            }
         }
 
         // Fixed BottomAppBar
@@ -159,11 +164,18 @@ fun MainPage(navController: NavController, username: String) {
 // Function to fetch events for a selected location from Firestore
 fun fetchEventsForLocation(location: String, onEventsFetched: (List<Map<String, String>>) -> Unit) {
     val db = FirebaseFirestore.getInstance()
-    db.collection("events").whereEqualTo("location", location).get()
+    db.collection("events")
+        .whereEqualTo("location", location)
+        .get()
         .addOnSuccessListener { querySnapshot ->
-            val eventsList = querySnapshot.documents.map { document ->
-                document.data?.mapValues { it.value.toString() } ?: emptyMap()
+            val eventsList = querySnapshot.documents.mapNotNull { document ->
+                val eventData = document.data ?: return@mapNotNull null
+
+                // Map the data to a string map
+                eventData.mapValues { it.value.toString() }
             }
+            // Log the fetched events for debugging
+            Log.d("fetchEventsForLocation", "Fetched events: $eventsList")
             onEventsFetched(eventsList)
         }
         .addOnFailureListener { exception ->
@@ -171,4 +183,3 @@ fun fetchEventsForLocation(location: String, onEventsFetched: (List<Map<String, 
             onEventsFetched(emptyList())
         }
 }
-
