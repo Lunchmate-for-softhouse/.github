@@ -9,9 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.lunchmate.ui.screens.HomePage
 import com.example.lunchmate.ui.screens.MainPage
 import com.example.lunchmate.ui.screens.RegisterPage
@@ -53,8 +55,14 @@ fun MainAppNavHost() {
         composable("register") {
             RegisterPage(navController = navController) // Register screen
         }
-        composable("main_page") {
-            MainPage(navController = navController) // Register screen
+        composable(
+            route = "main_page/{username}",
+            arguments = listOf(navArgument("username") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val username = backStackEntry.arguments?.getString("username")
+            if (username != null) {
+                MainPage(navController, username)
+            }
         }
 
     }

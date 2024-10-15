@@ -34,7 +34,7 @@ fun SignInPage(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFB4572F))
+            colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
             Column(
                 modifier = Modifier
@@ -104,7 +104,8 @@ fun SignInPage(navController: NavController) {
                                             Log.d("SignInPage", "Document ID: ${document.id}, Data: ${document.data}")
                                         }
                                         loginStatus = "Login Successful!"
-                                        navController.navigate("main_page")
+                                        // Navigate to MainPage with the username
+                                        navController.navigate("main_page/$username")
                                     } else {
                                         loginStatus = "Login Failed! Invalid credentials."
                                     }
