@@ -1,6 +1,7 @@
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -21,46 +22,53 @@ import androidx.navigation.NavController
 @Composable
 fun BottomNavBar(navController: NavController) {
     val fontSize = 12.sp
-    val buttonSpacing = 64.dp
-    val textcolour = Color.Black
+    val textColour = Color.Black
 
     BottomAppBar(
         containerColor = Color(0xFFB4572F),
         modifier = Modifier.padding(8.dp)
     ) {
-        IconButton(onClick = { navController.navigate("current_events") }) {
+        // Use weight to equally space buttons
+        IconButton(
+            onClick = { navController.navigate("current_events") },
+            modifier = Modifier.weight(1f)
+        ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(imageVector = Icons.Filled.Event, contentDescription = "Current Events")
+                Icon(imageVector = Icons.Filled.Event, contentDescription = "Current Events", modifier = Modifier.size(24.dp))
                 Text(
                     text = "Current Events",
                     fontSize = fontSize,
-                    color = textcolour
+                    color = textColour
                 )
             }
         }
 
-        Spacer(modifier = Modifier.width(buttonSpacing))
-
-        IconButton(onClick = { navController.navigate("upcoming_events") }) {
+        IconButton(
+            onClick = { navController.navigate("upcoming_events") },
+            modifier = Modifier.weight(1f)
+        ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(imageVector = Icons.Filled.EventAvailable, contentDescription = "Upcoming Events")
+                Icon(imageVector = Icons.Filled.EventAvailable, contentDescription = "Upcoming Events",
+                    modifier = Modifier.size(24.dp))
                 Text(
                     text = "Upcoming Events",
                     fontSize = fontSize,
-                    color = textcolour
+                    color = textColour
                 )
             }
         }
 
-        Spacer(modifier = Modifier.width(buttonSpacing))
-
-        IconButton(onClick = { navController.navigate("create_event") }) {
+        IconButton(
+            onClick = { navController.navigate("create_event") },
+            modifier = Modifier.weight(1f)
+        ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "Create Lunch Event")
+                Icon(imageVector = Icons.Filled.Add, contentDescription = "Create Event",
+                    modifier = Modifier.size(24.dp))
                 Text(
                     text = "Create Event",
                     fontSize = fontSize,
-                    color = textcolour
+                    color = textColour
                 )
             }
         }
