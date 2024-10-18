@@ -1,5 +1,5 @@
 package com.example.lunchmate.ui.screens
-
+/*
 import android.content.Intent
 import androidx.compose.material3.*
 import androidx.compose.material3.Button
@@ -17,4 +17,4 @@ fun CreateEventScreen() {
     }) {
         Text("Open Map")
     }
-}
+} */
