@@ -41,6 +41,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
 @Composable
 fun MainAppNavHost() {
     val navController: NavHostController = rememberNavController()
@@ -55,6 +56,7 @@ fun MainAppNavHost() {
         composable("register") {
             RegisterPage(navController = navController) // Register screen
         }
+
         composable(
             route = "main_page/{username}",
             arguments = listOf(navArgument("username") { type = NavType.StringType })

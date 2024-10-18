@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
 import androidx.navigation.NavController
+import com.example.lunchmate.ui.screens.CreateEventScreen
+
 
 @Composable
 fun BottomNavBar(navController: NavController) {
@@ -59,7 +61,8 @@ fun BottomNavBar(navController: NavController) {
         }
 
         IconButton(
-            onClick = { navController.navigate("create_event") },
+            onClick = { CreateEventScreen() }
+            ,
             modifier = Modifier.weight(1f)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -73,4 +76,7 @@ fun BottomNavBar(navController: NavController) {
             }
         }
     }
+}
+
+
 }
