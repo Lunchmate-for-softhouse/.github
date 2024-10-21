@@ -1,12 +1,13 @@
 package com.example.lunchmate
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.Spinner
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.lunchmate.R
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -53,6 +54,11 @@ class MapsActivityCurrentPlace : AppCompatActivity(), OnMapReadyCallback {
         // Load the map fragment
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        val listViewButton: Button = findViewById(R.id.btnListView)
+        listViewButton.setOnClickListener {
+            openRestaurantList()
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -95,6 +101,10 @@ class MapsActivityCurrentPlace : AppCompatActivity(), OnMapReadyCallback {
 
         builder.setCancelable(false)
         builder.show()
+    }
+    private fun openRestaurantList() {
+        val intent = Intent(this@MapsActivityCurrentPlace, ResturantListActivity::class.java)
+        startActivity(intent)
     }
 
     // Method to draw a circle of 1km radius around the location
