@@ -129,25 +129,8 @@ class ResturantListActivity : AppCompatActivity() {
                         restaurantList.clear()
                         for (i in 0 until results.length()) {
                             val place = results.getJSONObject(i)
-                            val location = place.getJSONObject("geometry").getJSONObject("location")
-                            val latLng = LatLng(location.getDouble("lat"), location.getDouble("lng"))
-
-                            val placeName = place.getString("name")
-                            val placeAddress = place.optString("vicinity", "No address available")
-                            val rating = place.optDouble("rating", -1.0).toFloat()
-                            val userRatingsTotal = place.optInt("user_ratings_total", 0)
-                            val openingHours = place.optJSONObject("opening_hours")?.optJSONArray("weekday_text")?.let {
-                                List(it.length()) { index -> it.getString(index) }
-                            }
-                            val priceLevel = place.optInt("price_level", -1)
-                            val photoReference = place.optJSONArray("photos")?.getJSONObject(0)?.getString("photo_reference")
-                            val types = place.optJSONArray("types")?.let {
-                                List(it.length()) { index -> it.getString(index) }
-                            } ?: emptyList()
-                            val website = place.optString("website", null)
-
-                            // Add restaurant to the list
-                            restaurantList.add(Restaurant(placeName, placeAddress, rating, userRatingsTotal, openingHours, priceLevel, photoReference, types, website))
+                            val placeId = place.getString("place_id")  // Get place ID
+                            fetchPlaceDetails(placeId)  // Fetch detailed information
                         }
                         restaurantAdapter.notifyDataSetChanged()
                     }
@@ -157,6 +140,64 @@ class ResturantListActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun fetchPlaceDetails(placeId: String) {
+        val detailsUrl = "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=AIzaSyBywwGx414Zvd7GIoP7TKh8BTN8DPYpt08"
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val client = OkHttpClient()
+                val request = Request.Builder().url(detailsUrl).build()
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) {
+                        Log.e(TAG, "Failed to fetch place details: ${response.code}")
+                        return@use
+                    }
+
+                    val jsonResponse = response.body!!.string()
+                    Log.d(TAG, "Place Details Response: $jsonResponse")
+
+                    val placeDetails = JSONObject(jsonResponse).getJSONObject("result")
+
+                    // Extracting details
+                    val placeName = placeDetails.optString("name")
+                    val placeAddress = placeDetails.optString("vicinity", "No address available")
+                    val rating = placeDetails.optDouble("rating", -1.0).toFloat()
+                    val userRatingsTotal = placeDetails.optInt("user_ratings_total", 0)
+                    val openingHours = placeDetails.optJSONObject("opening_hours")?.optJSONArray("weekday_text")?.let {
+                        List(it.length()) { index -> it.getString(index) }
+                    }
+                    val priceLevel = placeDetails.optInt("price_level", -1)
+                    val photoReference = placeDetails.optJSONArray("photos")?.getJSONObject(0)?.getString("photo_reference")
+                    val types = placeDetails.optJSONArray("types")?.let {
+                        List(it.length()) { index -> it.getString(index) }
+                    } ?: emptyList()
+                    val website = placeDetails.optString("website", null)
+
+                    // Create a new Restaurant object and add it to the list
+                    val restaurant = Restaurant(
+                        name = placeName,
+                        address = placeAddress,
+                        rating = rating,
+                        userRatingsTotal = userRatingsTotal,
+                        openingHours = openingHours,
+                        priceLevel = priceLevel,
+                        photoReference = photoReference,
+                        types = types,
+                        website = website // Now using the website
+                    )
+
+                    withContext(Dispatchers.Main) {
+                        restaurantList.add(restaurant) // Add restaurant to the list
+                        restaurantAdapter.notifyDataSetChanged() // Notify adapter of data changes
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error fetching place details", e)
+            }
+        }
+    }
+
 
     private fun showFilterDialog() {
         val cuisines = arrayOf("Italian", "Chinese", "Indian", "Mexican")

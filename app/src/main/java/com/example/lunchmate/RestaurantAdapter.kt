@@ -1,8 +1,11 @@
 package com.example.lunchmate
 
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lunchmate.model.Restaurant
@@ -19,18 +22,28 @@ class RestaurantAdapter(
         private val userRatingsTotalTextView: TextView = itemView.findViewById(R.id.userRatingsTotalTextView)
         private val openingHoursTextView: TextView = itemView.findViewById(R.id.openingHoursTextView)
         private val priceLevelTextView: TextView = itemView.findViewById(R.id.priceLevelTextView)
-        private val websiteTextView: TextView = itemView.findViewById(R.id.websiteTextView)
+        private val menuButton: Button = itemView.findViewById(R.id.menuButton)
 
         fun bind(restaurant: Restaurant) {
             nameTextView.text = restaurant.name
             addressTextView.text = restaurant.address
             ratingTextView.text = "Rating: ${restaurant.rating ?: "N/A"}"
             userRatingsTotalTextView.text = "User Ratings: ${restaurant.userRatingsTotal ?: "N/A"}"
-            openingHoursTextView.text = restaurant.openingHours?.joinToString("\n") ?: "No opening hours available"
             priceLevelTextView.text = "Price Level: ${restaurant.priceLevel ?: "N/A"}"
-            websiteTextView.text = restaurant.website ?: "No website available"
 
-            itemView.setOnClickListener { itemClick(restaurant) }
+            // Set button text and click listener
+            menuButton.text = "View Menu"
+            menuButton.setOnClickListener {
+                if (!restaurant.website.isNullOrBlank()) {
+                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(restaurant.website))
+                    it.context.startActivity(browserIntent)
+                } else {
+                    // Logic for showing a placeholder or message when no website is available
+                    // For example, you could show a Toast or open a dialog
+                    // Here, we are just using a placeholder Toast
+                    // Toast.makeText(it.context, "No menu available", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
