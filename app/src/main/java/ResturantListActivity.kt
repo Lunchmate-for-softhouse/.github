@@ -107,7 +107,7 @@ class ResturantListActivity : AppCompatActivity() {
     private fun searchNearbyRestaurants(location: LatLng) {
         val radius = 1000
         val type = "restaurant"
-        val apiKey = "AIzaSyBywwGx414Zvd7GIoP7TKh8BTN8DPYpt08" // Replace with your actual API key
+        val apiKey = "AIzaSyBywwGx414Zvd7GIoP7TKh8BTN8DPYpt08"
         val url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude},${location.longitude}&radius=$radius&type=$type&key=$apiKey"
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -134,9 +134,20 @@ class ResturantListActivity : AppCompatActivity() {
 
                             val placeName = place.getString("name")
                             val placeAddress = place.optString("vicinity", "No address available")
+                            val rating = place.optDouble("rating", -1.0).toFloat()
+                            val userRatingsTotal = place.optInt("user_ratings_total", 0)
+                            val openingHours = place.optJSONObject("opening_hours")?.optJSONArray("weekday_text")?.let {
+                                List(it.length()) { index -> it.getString(index) }
+                            }
+                            val priceLevel = place.optInt("price_level", -1)
+                            val photoReference = place.optJSONArray("photos")?.getJSONObject(0)?.getString("photo_reference")
+                            val types = place.optJSONArray("types")?.let {
+                                List(it.length()) { index -> it.getString(index) }
+                            } ?: emptyList()
+                            val website = place.optString("website", null)
 
                             // Add restaurant to the list
-                            restaurantList.add(Restaurant(placeName, placeAddress))
+                            restaurantList.add(Restaurant(placeName, placeAddress, rating, userRatingsTotal, openingHours, priceLevel, photoReference, types, website))
                         }
                         restaurantAdapter.notifyDataSetChanged()
                     }

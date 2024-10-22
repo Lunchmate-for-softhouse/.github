@@ -8,30 +8,40 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.lunchmate.model.Restaurant
 
 class RestaurantAdapter(
-    private val restaurantList: MutableList<Restaurant>,
-    private val clickListener: (Restaurant) -> Unit
+    private val restaurants: List<Restaurant>,
+    private val itemClick: (Restaurant) -> Unit
 ) : RecyclerView.Adapter<RestaurantAdapter.RestaurantViewHolder>() {
 
     inner class RestaurantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val restaurantName: TextView = itemView.findViewById(R.id.textName)
-        private val restaurantAddress: TextView = itemView.findViewById(R.id.textAddress)
+        private val nameTextView: TextView = itemView.findViewById(R.id.textName)
+        private val addressTextView: TextView = itemView.findViewById(R.id.textAddress)
+        private val ratingTextView: TextView = itemView.findViewById(R.id.ratingTextView)
+        private val userRatingsTotalTextView: TextView = itemView.findViewById(R.id.userRatingsTotalTextView)
+        private val openingHoursTextView: TextView = itemView.findViewById(R.id.openingHoursTextView)
+        private val priceLevelTextView: TextView = itemView.findViewById(R.id.priceLevelTextView)
+        private val websiteTextView: TextView = itemView.findViewById(R.id.websiteTextView)
 
         fun bind(restaurant: Restaurant) {
-            restaurantName.text = restaurant.name
-            restaurantAddress.text = restaurant.address
-            itemView.setOnClickListener { clickListener(restaurant) }  // Pass the clicked restaurant to the listener
+            nameTextView.text = restaurant.name
+            addressTextView.text = restaurant.address
+            ratingTextView.text = "Rating: ${restaurant.rating ?: "N/A"}"
+            userRatingsTotalTextView.text = "User Ratings: ${restaurant.userRatingsTotal ?: "N/A"}"
+            openingHoursTextView.text = restaurant.openingHours?.joinToString("\n") ?: "No opening hours available"
+            priceLevelTextView.text = "Price Level: ${restaurant.priceLevel ?: "N/A"}"
+            websiteTextView.text = restaurant.website ?: "No website available"
+
+            itemView.setOnClickListener { itemClick(restaurant) }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RestaurantViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.restaurant_list_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.restaurant_list_item, parent, false)
         return RestaurantViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: RestaurantViewHolder, position: Int) {
-        holder.bind(restaurant = restaurantList[position])
+        holder.bind(restaurants[position])
     }
 
-    override fun getItemCount(): Int = restaurantList.size
+    override fun getItemCount() = restaurants.size
 }
