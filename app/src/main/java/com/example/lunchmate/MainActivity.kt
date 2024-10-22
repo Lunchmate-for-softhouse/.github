@@ -56,6 +56,9 @@ fun MainAppNavHost() {
         composable("register") {
             RegisterPage(navController = navController) // Register screen
         }
+        composable("register") {
+            RegisterPage(navController = navController) // Register screen
+        }
 
         composable(
             route = "main_page/{username}",

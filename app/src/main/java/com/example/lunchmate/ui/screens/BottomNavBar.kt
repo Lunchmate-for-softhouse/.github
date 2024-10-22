@@ -7,7 +7,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Reviews
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,14 +29,12 @@ import com.example.lunchmate.MapsActivityCurrentPlace
 fun BottomNavBar(navController: NavController) {
     val context = LocalContext.current
 
-    // Bottom navigation bar
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color(0xFFB4572F))
             .padding(8.dp)
     ) {
-        // Button for "Current Events"
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -39,41 +43,18 @@ fun BottomNavBar(navController: NavController) {
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // Placeholder for an icon or image
-                Box(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .background(Color.Black)
+                Icon(
+                    imageVector = Icons.Filled.Event,
+                    contentDescription = "Current Events",
+                    modifier = Modifier.size(24.dp),
+                    tint = Color.Black
                 )
-                BasicText(
+                Text(
                     text = "Current Events",
-                    style = TextStyle(fontSize = 12.sp, color = Color.Black) // Updated here
+                    style = TextStyle(fontSize = 12.sp, color = Color.Black)
                 )
             }
         }
-
-        // Button for "Upcoming Events"
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .clickable { navController.navigate("upcoming_events") }
-                .padding(8.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .background(Color.Black)
-                )
-                BasicText(
-                    text = "Upcoming Events",
-                    style = TextStyle(fontSize = 12.sp, color = Color.Black) // Updated here
-                )
-            }
-        }
-
-        // Button for "Create Event" that launches MapsActivityCurrentPlace
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -85,14 +66,56 @@ fun BottomNavBar(navController: NavController) {
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .background(Color.Black)
+                Icon(
+                    imageVector = Icons.Filled.Map,
+                    contentDescription = "Maps",
+                    modifier = Modifier.size(24.dp),
+                    tint = Color.Black
                 )
-                BasicText(
+                Text(
+                    text = "Maps",
+                    style = TextStyle(fontSize = 12.sp, color = Color.Black)
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .clickable { navController.navigate("create_event") }
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Create Event",
+                    modifier = Modifier.size(24.dp),
+                    tint = Color.Black
+                )
+                Text(
                     text = "Create Event",
-                    style = TextStyle(fontSize = 12.sp, color = Color.Black) // Updated here
+                    style = TextStyle(fontSize = 12.sp, color = Color.Black)
+                )
+            }
+        }
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .clickable { navController.navigate("reviews") }
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = Icons.Filled.Reviews,
+                    contentDescription = "Reviews",
+                    modifier = Modifier.size(24.dp),
+                    tint = Color.Black
+                )
+                Text(
+                    text = "Reviews",
+                    style = TextStyle(fontSize = 12.sp, color = Color.Black)
                 )
             }
         }
