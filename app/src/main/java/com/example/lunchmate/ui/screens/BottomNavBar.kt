@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.lunchmate.MapsActivityCurrentPlace
 
+
 @Composable
 fun BottomNavBar(navController: NavController) {
     val context = LocalContext.current
