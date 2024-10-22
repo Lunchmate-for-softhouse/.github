@@ -12,7 +12,7 @@
           "package_name": "com.example.lunchmate"
         }
       },
-      "oauth_client": [],
+      "oauth_client": ["1061775242687-q723c4ctfn19e5qa7b2pmg48jc7na7vu.apps.googleusercontent.com"],
       "api_key": [
         {
           "current_key": "AIzaSyAB-h7hng6HsPXvn8nQf9kg-FPsOKHV7y0"
