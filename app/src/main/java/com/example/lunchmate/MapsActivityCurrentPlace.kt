@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
+import androidx.navigation.NavController
 import android.widget.Button
 import android.widget.Spinner
 import androidx.appcompat.app.AlertDialog
@@ -26,7 +27,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 
-class MapsActivityCurrentPlace : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivityCurrentPlace() : AppCompatActivity(), OnMapReadyCallback {
     private var map: GoogleMap? = null
     private lateinit var placesClient: PlacesClient
 
