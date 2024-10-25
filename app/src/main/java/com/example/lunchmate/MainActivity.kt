@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.HomePage
 import com.example.lunchmate.ui.screens.MainPage
 import com.example.lunchmate.ui.screens.RegisterPage
@@ -63,6 +64,9 @@ fun MainAppNavHost() {
             if (username != null) {
                 MainPage(navController, username)
             }
+        }
+        composable("create_event"){
+            CreateEvents(navController = navController)
         }
 
     }
