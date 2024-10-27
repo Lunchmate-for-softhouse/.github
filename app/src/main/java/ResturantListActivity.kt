@@ -167,7 +167,7 @@ class ResturantListActivity : AppCompatActivity() {
                     val openingHours = placeDetails.optJSONObject("opening_hours")?.optJSONArray("weekday_text")?.let {
                         List(it.length()) { index -> it.getString(index) }
                     }
-                    val priceLevel = placeDetails.optInt("price_level", -1)
+                    val priceLevel = placeDetails.optString("price_level",)
                     val photoReference = placeDetails.optJSONArray("photos")?.getJSONObject(0)?.getString("photo_reference")
                     val types = placeDetails.optJSONArray("types")?.let {
                         List(it.length()) { index -> it.getString(index) }
@@ -198,16 +198,62 @@ class ResturantListActivity : AppCompatActivity() {
         }
     }
 
-
     private fun showFilterDialog() {
-        val cuisines = arrayOf("Italian", "Chinese", "Indian", "Mexican")
+       // val types = arrayOf("All", "Restaurant", "Cafe", "Pub")
+        val priceLevels = arrayOf("All", "Inexpensive", "Moderate", "Expensive", "Very Expensive")
+
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Select Cuisine")
-        builder.setItems(cuisines) { _, which ->
-            val selectedCuisine = cuisines[which]
-            // Apply filter based on selectedCuisine (you can implement filtering logic here)
+        builder.setTitle("Filter Restaurants")
+
+        val inflater = layoutInflater
+        val dialogView = inflater.inflate(R.layout.dialog_filter, null)
+        builder.setView(dialogView)
+
+        //val cuisineSpinner: Spinner = dialogView.findViewById(R.id.cuisineSpinner)
+        val priceSpinner: Spinner = dialogView.findViewById(R.id.priceSpinner)
+
+        // Set up the spinners
+        //val cuisineAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, types)
+        //cuisineSpinner.adapter = cuisineAdapter
+
+        val priceAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, priceLevels)
+        priceSpinner.adapter = priceAdapter
+
+        builder.setPositiveButton("Apply") { dialog, _ ->
+            //val selectedCuisine = cuisineSpinner.selectedItem.toString()
+            val selectedPriceLevel = priceSpinner.selectedItem.toString()
+
+            filterRestaurants( selectedPriceLevel)
+            dialog.dismiss()
         }
+
+        builder.setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
         builder.show()
+    }
+    private fun filterRestaurants(selectedPriceLevel: String) {
+        val filteredList = restaurantList.filter { restaurant ->
+            // Map restaurant price levels to the filter choices
+            val priceMatches = when (selectedPriceLevel) {
+                "All" -> true
+                "Inexpensive" -> restaurant.priceLevel == "1"
+                "Moderate" -> restaurant.priceLevel == "2"
+                "Expensive" -> restaurant.priceLevel == "3"
+                "Very Expensive" -> restaurant.priceLevel == "4"
+                else -> true
+            }
+
+            // Check if the cuisine type matches
+            //val cuisineMatches = selectedCuisine == "All" || restaurant.types.contains(selectedCuisine)
+
+
+             priceMatches
+        }
+
+        // Update the adapter data without creating a new instance
+        restaurantAdapter = RestaurantAdapter(filteredList) { restaurant ->
+            // Handle restaurant click
+        }
+        restaurantRecyclerView.adapter = restaurantAdapter
     }
 
     companion object {

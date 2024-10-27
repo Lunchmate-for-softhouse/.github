@@ -9,8 +9,8 @@ data class Restaurant(
     val rating: Float?, // Rating of the restaurant
     val userRatingsTotal: Int?, // Total user ratings
     val openingHours: List<String>?, // List of opening hours (you might want to define a custom data structure for this)
-    val priceLevel: Int?, // Price level (1-4)
-    val photoReference: String?, // Photo reference for images
-    val types: List<String>, // List of types (e.g., Italian, Fast Food)
+    val priceLevel: String?,
+    val photoReference: String?,
+    val types: List<String>,
     val website: String? // Website link
 )

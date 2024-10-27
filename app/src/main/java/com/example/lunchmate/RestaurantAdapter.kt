@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lunchmate.model.Restaurant
 
@@ -41,7 +42,7 @@ class RestaurantAdapter(
                     // Logic for showing a placeholder or message when no website is available
                     // For example, you could show a Toast or open a dialog
                     // Here, we are just using a placeholder Toast
-                    // Toast.makeText(it.context, "No menu available", Toast.LENGTH_SHORT).show()
+                     Toast.makeText(it.context, "No menu available", Toast.LENGTH_SHORT).show()
                 }
             }
         }
