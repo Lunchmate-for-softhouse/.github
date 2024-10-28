@@ -30,7 +30,7 @@ import com.example.lunchmate.ui.screens.RegisterPage
 import com.example.lunchmate.ui.screens.SignInPage
 import com.example.lunchmate.ui.theme.LunchMateTheme
 import com.google.firebase.FirebaseApp
-import com.example.lunchmate.ui.screens.EventPage // Import the EventPage
+//import com.example.lunchmate.ui.screens.EventPage // Import the EventPage
 import java.util.concurrent.TimeUnit
 
 
@@ -106,6 +106,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import com.example.lunchmate.com.example.lunchmate.ui.screens.ReviewPage
+import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.ReviewNotificationWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -361,11 +362,15 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
             arguments = listOf(navArgument("restaurantName") { type = NavType.StringType })
         ) { backStackEntry ->
             val restaurantName = backStackEntry.arguments?.getString("restaurantName") ?: "Unknown Restaurant"
-            EventPage(navController = navController, restaurantName = restaurantName, context = context) // Pass context here
+            //EventPage(navController = navController, restaurantName = restaurantName, context = context) // Pass context here
+        }
+
+        composable("create_event"){
+            CreateEvents(navController = navController)
         }
 
         // Add the ReviewPage composable
-        composable("review") {
+        composable("review_pag") {
             ReviewPage(onBack = { navController.popBackStack() }) // Navigate back to the previous screen
         }
     }

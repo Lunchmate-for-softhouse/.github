@@ -112,7 +112,7 @@ dependencies {
     implementation ("androidx.compose.material3:material3:<latest-version>")
     implementation ("androidx.work:work-runtime-ktx:2.7.1")
     // WorkManager for background tasks
-    implementation ("androidx.work:work-runtime-ktx:2.7.1")
+
 
 
 }
