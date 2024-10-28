@@ -1,0 +1,15 @@
+androidx.work.CoroutineWorker
+androidx.work.CoroutineWorker$1
+androidx.work.CoroutineWorker$getForegroundInfoAsync$1
+androidx.work.CoroutineWorker$startWork$1
+androidx.work.DataKt
+androidx.work.DirectExecutor
+androidx.work.JobListenableFuture
+androidx.work.JobListenableFuture$1
+androidx.work.ListenableFutureKt
+androidx.work.ListenableFutureKt$await$2$1
+androidx.work.ListenableFutureKt$await$2$2
+androidx.work.OneTimeWorkRequestKt
+androidx.work.OperationKt
+androidx.work.OperationKt$await$1
+androidx.work.PeriodicWorkRequestKt
