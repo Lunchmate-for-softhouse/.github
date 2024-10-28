@@ -17,6 +17,17 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+//import androidx.compose.material3.icons.Icons
+//import androidx.compose.material3.icons.filled.ArrowDropDown
+
+
 @Composable
 fun CreateEvents(navController: NavController) {
     val fontSize = 16.sp
@@ -125,7 +136,10 @@ fun CreateEvents(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Location input text field
+        val locations = listOf("Karlskrona", "Stockholm", "Malmö", "Göteborg")
+        var expanded by remember { mutableStateOf(false) }
+
+        // Location dropdown menu
         Text(
             text = "Location",
             fontSize = 16.sp,
@@ -133,18 +147,38 @@ fun CreateEvents(navController: NavController) {
             color = Color.Black,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        BasicTextField(
-            value = eventLocation,
-            onValueChange = { eventLocation = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-                .padding(8.dp),
-            decorationBox = { innerTextField ->
-                if (eventLocation.isEmpty()) Text("Enter location", color = Color.Gray)
-                innerTextField()
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .clickable { expanded = true }
+                    .background(Color.White)
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (eventLocation.isEmpty()) "Choose location" else eventLocation,
+                    color = if (eventLocation.isEmpty()) Color.Gray else Color.Black
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Dropdown Icon")
             }
-        )
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                locations.forEach { location ->
+                    DropdownMenuItem(
+                        text = { Text(location) },
+                        onClick = {
+                            eventLocation = location
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 

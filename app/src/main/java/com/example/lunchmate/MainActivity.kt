@@ -18,6 +18,7 @@ import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.HomePage
 import com.example.lunchmate.ui.screens.MainPage
 import com.example.lunchmate.ui.screens.RegisterPage
+//import com.example.lunchmate.ui.screens.Reviews
 import com.example.lunchmate.ui.screens.SignInPage
 import com.example.lunchmate.ui.theme.LunchMateTheme
 import com.google.firebase.FirebaseApp
@@ -68,6 +69,8 @@ fun MainAppNavHost() {
         composable("create_event"){
             CreateEvents(navController = navController)
         }
-
+        //composable("create_event"){
+           // Reviews(navController = navController)
+        }
     }
-}
+
