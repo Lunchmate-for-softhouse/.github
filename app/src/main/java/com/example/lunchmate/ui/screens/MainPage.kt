@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.firestore.FirebaseFirestore
 
-@Composable
+/*@Composable
 fun MainPage(navController: NavController, username: String) {
     var location by remember { mutableStateOf("Karlskrona") }
     var events by remember { mutableStateOf(listOf<Map<String, String>>()) }
@@ -159,27 +159,76 @@ fun MainPage(navController: NavController, username: String) {
         // Fixed BottomAppBar
         BottomNavBar(navController = navController)
     }
-}
+}*/
+@Composable
+fun MainPage(navController: NavController, username: String) {
+    var location by remember { mutableStateOf("Karlskrona") }
+    var expanded by remember { mutableStateOf(false) }
+    val locations = listOf("Karlskrona", "Stockholm", "Malmö", "Gothenburg")
 
-// Function to fetch events for a selected location from Firestore
-fun fetchEventsForLocation(location: String, onEventsFetched: (List<Map<String, String>>) -> Unit) {
-    val db = FirebaseFirestore.getInstance()
-    db.collection("events")
-        .whereEqualTo("location", location)
-        .get()
-        .addOnSuccessListener { querySnapshot ->
-            val eventsList = querySnapshot.documents.mapNotNull { document ->
-                val eventData = document.data ?: return@mapNotNull null
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(
+            modifier = Modifier.weight(1f).padding(16.dp)
+        ) {
+            Text(
+                text = "Where do you want to eat today in $location?",
+                style = MaterialTheme.typography.displayMedium,
+                color = Color.White
+            )
 
-                // Map the data to a string map
-                eventData.mapValues { it.value.toString() }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Dropdown for selecting location
+            TextField(
+                value = location,
+                onValueChange = {},
+                label = { Text("Select Location") },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = "Dropdown Icon",
+                        modifier = Modifier.clickable { expanded = !expanded }
+                    )
+                },
+                readOnly = true
+            )
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                locations.forEach { loc ->
+                    DropdownMenuItem(
+                        text = { Text(loc) },
+                        onClick = {
+                            location = loc
+                            expanded = false
+                        }
+                    )
+                }
             }
-            // Log the fetched events for debugging
-            Log.d("fetchEventsForLocation", "Fetched events: $eventsList")
-            onEventsFetched(eventsList)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Button to navigate to the EventPage directly
+            Button(
+                onClick = {
+                    // Navigate to EventPage with a hardcoded restaurant name
+                    navController.navigate("event_page/KFC")  // Pass "KFC" as restaurant name
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+            ) {
+                Text("Go to Event Page")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
-        .addOnFailureListener { exception ->
-            Log.e("fetchEventsForLocation", "Error fetching events: ${exception.message}")
-            onEventsFetched(emptyList())
-        }
+
+        BottomNavBar(navController = navController)
+    }
 }

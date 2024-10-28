@@ -109,6 +109,11 @@ dependencies {
     implementation ("com.squareup.okhttp3:okhttp:4.9.3")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0")
+    implementation ("androidx.compose.material3:material3:<latest-version>")
+    implementation ("androidx.work:work-runtime-ktx:2.7.1")
+    // WorkManager for background tasks
+    implementation ("androidx.work:work-runtime-ktx:2.7.1")
+
 
 }
 
