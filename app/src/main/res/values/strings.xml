@@ -2,6 +2,7 @@
     <string name="app_name">LunchMate</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="default_web_client_id">697488453191-tgkugd4628eqrbinnkmv33cn00pjf5jm.apps.googleusercontent.com</string>
+    <string name="title_activity_list" />
 
 
 </resources>

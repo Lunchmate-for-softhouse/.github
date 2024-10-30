@@ -2,7 +2,6 @@ package com.example.lunchmate.ui.screens
 
 import BottomNavBar
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,9 +12,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.firestore.FirebaseFirestore
+import com.example.lunchmate.R
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.IOException
 
 @Composable
 fun MainPage(navController: NavController, username: String) {
@@ -24,7 +30,10 @@ fun MainPage(navController: NavController, username: String) {
     var expanded by remember { mutableStateOf(false) }
     val locations = listOf("Karlskrona", "Stockholm", "Malmö", "Gothenburg")
 
-    // Fetch the location and events from Firestore
+    // Define context inside the composable
+    val context = LocalContext.current
+
+    // Fetch location and events from Firestore
     LaunchedEffect(Unit) {
         val db = FirebaseFirestore.getInstance()
         val userRef = db.collection("users").document(username)
@@ -49,7 +58,6 @@ fun MainPage(navController: NavController, username: String) {
             .update("location", newLocation)
             .addOnSuccessListener {
                 location = newLocation
-                // Fetch new events for the updated location
                 fetchEventsForLocation(location) { eventList ->
                     events = eventList
                 }
@@ -86,7 +94,7 @@ fun MainPage(navController: NavController, username: String) {
                         modifier = Modifier.clickable { expanded = !expanded }
                     )
                 },
-                readOnly = true // Disable editing
+                readOnly = true
             )
 
             DropdownMenu(
@@ -112,19 +120,17 @@ fun MainPage(navController: NavController, username: String) {
 
                 Column(modifier = Modifier.fillMaxWidth()) {
                     events.forEach { event ->
-                        // Ensure safe access to map values
                         val eventTitle = event["title"] ?: "Untitled Event"
                         val eventDescription = event["Description"] ?: "No description available"
                         val restaurantName = event["Restaurantname"] ?: "Unknown Restaurant"
 
-                        // Card layout for each event
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp),
                             shape = RoundedCornerShape(8.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1F1F1F)) // Darker background for card
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1F1F1F))
                         ) {
                             Column(
                                 modifier = Modifier.padding(16.dp),
@@ -136,7 +142,6 @@ fun MainPage(navController: NavController, username: String) {
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(text = "Restaurant: $restaurantName", color = Color.White)
 
-                                // Button to join the event
                                 Button(
                                     onClick = {
                                         navController.navigate("event_page")
@@ -154,6 +159,20 @@ fun MainPage(navController: NavController, username: String) {
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    Log.d("SwishPaymentButton", "Pay with Swish button clicked")
+                    makeSwishPaymentRequest(context) // Call the payment function
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF00C300) // Swish green color
+                ),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(text = "Pay with Swish", color = Color.White)
+            }
+
         }
 
         // Fixed BottomAppBar
@@ -170,11 +189,8 @@ fun fetchEventsForLocation(location: String, onEventsFetched: (List<Map<String, 
         .addOnSuccessListener { querySnapshot ->
             val eventsList = querySnapshot.documents.mapNotNull { document ->
                 val eventData = document.data ?: return@mapNotNull null
-
-                // Map the data to a string map
                 eventData.mapValues { it.value.toString() }
             }
-            // Log the fetched events for debugging
             Log.d("fetchEventsForLocation", "Fetched events: $eventsList")
             onEventsFetched(eventsList)
         }
