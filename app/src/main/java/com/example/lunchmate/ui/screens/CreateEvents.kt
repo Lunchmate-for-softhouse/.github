@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CreateEvents(navController: NavController) {
+fun CreateEvents(navController: NavController, Location: String, userName: String) {
     val fontSize = 16.sp
     val textColour = Color.Black
 
@@ -32,15 +32,10 @@ fun CreateEvents(navController: NavController) {
     var eventDate by remember { mutableStateOf("") }
     var eventTime by remember { mutableStateOf("") }
     var eventDescription by remember { mutableStateOf("") }
-    var createdBy by remember { mutableStateOf("") }
+    val createdBy = userName // Set username as constant
+    val location = Location // Set location as constant
     var pickupDineIn by remember { mutableStateOf("Pick up") }
     var isPickup by remember { mutableStateOf(true) }
-
-    // Location Dropdown states
-    var location by remember { mutableStateOf("Select Location") }
-    var expanded by remember { mutableStateOf(false) }
-    val locations = listOf("Malmö", "Stockholm", "Karlskrona", "Växjö","Karlshamn",
-        "Jönköping","Luleå","Uppsala","Kalmar")
 
     // Snackbar host state
     val snackbarHostState = remember { SnackbarHostState() }
@@ -50,7 +45,7 @@ fun CreateEvents(navController: NavController) {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            BottomNavBar(navController = navController) // Place BottomNavBar here
+            BottomNavBar(navController = navController)
         },
         content = { padding ->
             Column(
@@ -58,7 +53,7 @@ fun CreateEvents(navController: NavController) {
                     .fillMaxSize()
                     .background(Color(0xFFFBE8E3))
                     .padding(16.dp)
-                    .padding(padding) // Ensure padding for Snackbar
+                    .padding(padding)
             ) {
                 // Header
                 Text(
@@ -68,33 +63,33 @@ fun CreateEvents(navController: NavController) {
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 
-                Spacer(modifier = Modifier.height(22.dp)) // Space after header
+                Spacer(modifier = Modifier.height(22.dp))
 
                 // Event Name Input
                 Text("Event Name", fontSize = fontSize, color = textColour)
-                Spacer(modifier = Modifier.height(8.dp)) // Space before input field
+                Spacer(modifier = Modifier.height(8.dp))
                 TextFieldWithLabel(
                     value = eventName,
                     onValueChange = { newValue -> eventName = newValue },
                     placeholder = "Enter Restaurant Name"
                 )
 
-                Spacer(modifier = Modifier.height(22.dp)) // Space after input field
+                Spacer(modifier = Modifier.height(22.dp))
 
                 // Description Input
                 Text("Description", fontSize = fontSize, color = textColour)
-                Spacer(modifier = Modifier.height(8.dp)) // Space before input field
+                Spacer(modifier = Modifier.height(8.dp))
                 TextFieldWithLabel(
                     value = eventDescription,
                     onValueChange = { newValue -> eventDescription = newValue },
                     placeholder = "Give A comment"
                 )
 
-                Spacer(modifier = Modifier.height(22.dp)) // Space after input field
+                Spacer(modifier = Modifier.height(22.dp))
 
                 // Date and Time Inputs in a Row
                 Text("Date", fontSize = fontSize, color = textColour)
-                Spacer(modifier = Modifier.height(8.dp)) // Space before date input
+                Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -110,7 +105,7 @@ fun CreateEvents(navController: NavController) {
                         TextFieldWithLabel(
                             value = eventDate,
                             onValueChange = { newValue -> eventDate = newValue },
-                            placeholder = "DD/MM/YYYY" // Placeholder for Date
+                            placeholder = "DD/MM/YYYY"
                         )
                     }
 
@@ -127,61 +122,31 @@ fun CreateEvents(navController: NavController) {
                         TextFieldWithLabel(
                             value = eventTime,
                             onValueChange = { newValue -> eventTime = newValue },
-                            placeholder = "HH:MM" // Placeholder for Time
+                            placeholder = "HH:MM"
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(22.dp)) // Space after date and time inputs
+                Spacer(modifier = Modifier.height(22.dp))
 
-                // Location Dropdown with Field Design
+                // Display Location (uneditable)
                 Text("Location", fontSize = fontSize, color = textColour)
-                Spacer(modifier = Modifier.height(8.dp)) // Space before dropdown
-
-                Box(
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = location,
+                    fontSize = 16.sp,
+                    color = Color.Black,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(1.dp, Color.Gray, shape = MaterialTheme.shapes.small)
-                        .padding(vertical = 8.dp, horizontal = 12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = if (location == "Select Location") "Select Location" else location,
-                            modifier = Modifier.weight(1f),
-                            fontSize = 16.sp,
-                            color = if (location == "Select Location") Color.Gray else Color.Black
-                        )
-                        IconButton(onClick = { expanded = !expanded }) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = "Dropdown Icon"
-                            )
-                        }
-                    }
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        locations.forEach { loc ->
-                            DropdownMenuItem(
-                                onClick = {
-                                    location = loc
-                                    expanded = false
-                                },
-                                text = { Text(loc) }
-                            )
-                        }
-                    }
-                }
+                        .background(Color.White)
+                        .padding(8.dp)
+                )
 
-                Spacer(modifier = Modifier.height(22.dp)) // Space after dropdown
+                Spacer(modifier = Modifier.height(22.dp))
 
                 // Pick up or Dine in Toggle
                 Text("Pickup/Dine In", fontSize = fontSize, color = textColour)
-                Spacer(modifier = Modifier.height(8.dp)) // Space before toggle buttons
+                Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -206,23 +171,27 @@ fun CreateEvents(navController: NavController) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(22.dp)) // Space after toggle buttons
+                Spacer(modifier = Modifier.height(22.dp))
 
-                // Created By Input
+                // Created By (uneditable)
                 Text("Created By", fontSize = fontSize, color = textColour)
-                Spacer(modifier = Modifier.height(8.dp)) // Space before input field
-                TextFieldWithLabel(
-                    value = createdBy,
-                    onValueChange = { newValue -> createdBy = newValue },
-                    placeholder = "Enter your name"
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = createdBy,
+                    fontSize = 16.sp,
+                    color = Color.Black,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .padding(8.dp)
                 )
 
-                Spacer(modifier = Modifier.height(32.dp)) // Space after input field
+                Spacer(modifier = Modifier.height(32.dp))
 
                 // Create Event Button
                 Button(
                     onClick = {
-                        if (eventName.isNotBlank() && eventDate.isNotBlank() && eventTime.isNotBlank() && location != "Select Location") {
+                        if (eventName.isNotBlank() && eventDate.isNotBlank() && eventTime.isNotBlank()) {
                             saveEvent(
                                 eventName = eventName,
                                 eventDate = eventDate,
@@ -230,15 +199,13 @@ fun CreateEvents(navController: NavController) {
                                 eventDescription = eventDescription,
                                 createdBy = createdBy,
                                 pickupDineIn = pickupDineIn,
-                                location = location // Add location to the saved event
+                                location = location
                             )
-                            // Show success feedback
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar("Event created successfully!")
-                                navController.navigate("current_events") // Replace with your actual screen
+                                navController.navigate("current_events")
                             }
                         } else {
-                            // Show error feedback
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar("Please fill in all required fields")
                             }
@@ -258,6 +225,8 @@ fun CreateEvents(navController: NavController) {
         }
     )
 }
+
+
 
 // Helper function for labeled text fields
 @Composable

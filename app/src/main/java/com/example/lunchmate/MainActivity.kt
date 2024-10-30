@@ -111,6 +111,7 @@ import com.example.lunchmate.com.example.lunchmate.ui.screens.ReviewPage
 import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.EventsMade
 import com.example.lunchmate.ui.screens.ReviewNotificationWorker
+import com.example.lunchmate.ui.screens.chaneloc
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -378,7 +379,7 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
         }
 
         composable("create_event"){
-            CreateEvents(navController = navController)
+            CreateEvents(navController = navController, chaneloc, userstore)
         }
 
         // Add the ReviewPage composable
