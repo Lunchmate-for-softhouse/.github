@@ -1,4 +1,8 @@
 package com.example.lunchmate.model
 
-class User {
-}
+data class User(
+    val username: String = "",
+    val password: String = "",
+    val swishNumber: String = "",
+    val location: String = ""
+)
