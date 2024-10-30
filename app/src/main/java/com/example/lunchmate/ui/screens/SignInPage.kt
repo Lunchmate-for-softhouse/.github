@@ -43,37 +43,25 @@ fun SignInPage(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                BasicTextField(
+                TextField(
                     value = username,
                     onValueChange = { username = it },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
-                    singleLine = true,
-                    decorationBox = { innerTextField ->
-                        if (username.isEmpty()) {
-                            Text(text = "Enter Email", color = Color.Gray)
-                        }
-                        innerTextField()
-                    }
+                    placeholder = { Text(text = "Enter Username", color = Color.Gray) }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                BasicTextField(
+                TextField(
                     value = password,
                     onValueChange = { password = it },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
-                    singleLine = true,
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    decorationBox = { innerTextField ->
-                        if (password.isEmpty()) {
-                            Text(text = "Enter Password", color = Color.Gray)
-                        }
-                        innerTextField()
-                    }
+                    placeholder = { Text(text = "Enter Password", color = Color.Gray) },
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation()
                 )
 
                 Text(
@@ -89,7 +77,7 @@ fun SignInPage(navController: NavController) {
                 Button(
                     onClick = {
                         if (username.isEmpty() || password.isEmpty()) {
-                            loginStatus = "Please enter both email and password."
+                            loginStatus = "Please enter both username and password."
                         } else {
                             // Query Firestore
                             db.collection("users")
@@ -100,9 +88,6 @@ fun SignInPage(navController: NavController) {
                                     Log.d("SignInPage", "Documents fetched: ${documents.size()}")
 
                                     if (!documents.isEmpty) {
-                                        for (document in documents) {
-                                            Log.d("SignInPage", "Document ID: ${document.id}, Data: ${document.data}")
-                                        }
                                         loginStatus = "Login Successful!"
                                         // Navigate to MainPage with the username
                                         navController.navigate("main_page/$username")
