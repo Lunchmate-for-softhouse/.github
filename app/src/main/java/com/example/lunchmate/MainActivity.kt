@@ -99,14 +99,17 @@ fun MainAppNavHost() {
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.ActivityResultLauncher
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import com.example.lunchmate.com.example.lunchmate.ui.screens.ReviewPage
 import com.example.lunchmate.ui.screens.CreateEvents
+import com.example.lunchmate.ui.screens.EventsMade
 import com.example.lunchmate.ui.screens.ReviewNotificationWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -239,8 +242,10 @@ fun MainAppNavHost(context: Context) {
 }*/
 class MainActivity : ComponentActivity() {
 
+
     companion object {
         private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 1001
+
     }
 
     // Declare the permission launcher
@@ -248,8 +253,10 @@ class MainActivity : ComponentActivity() {
 
     private var shouldNavigateToReview by mutableStateOf(false)
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         // Delay Firebase initialization if not immediately needed
         GlobalScope.launch(Dispatchers.IO) {
@@ -327,8 +334,11 @@ class MainActivity : ComponentActivity() {
 }
 
 // Composable navigation host for the app
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
+    var userstore = ""
+
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "home") {
@@ -348,13 +358,15 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
         ) { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username")
             if (username != null) {
+                userstore = username
                 MainPage(navController, username)
             }
         }
-
-        composable("main_page") {
-            MainPage(navController = navController, username = "example_user")
-        }
+            composable("current_events") {
+                // Replace "user_id" with the actual logic to get the current user's ID
+                val creatorName = userstore // Get the current user's ID
+                EventsMade(navController = navController, creatorName = creatorName) // Pass currentUserId here
+            }
 
         // Composable for EventPage with dynamic restaurantName argument
         composable(
