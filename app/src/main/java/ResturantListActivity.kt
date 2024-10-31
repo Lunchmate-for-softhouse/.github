@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lunchmate.model.Restaurant
+import com.example.lunchmate.ui.screens.chaneloc
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
@@ -28,17 +29,24 @@ class ResturantListActivity : AppCompatActivity() {
     private lateinit var restaurantAdapter: RestaurantAdapter
     private val restaurantList = mutableListOf<Restaurant>()
 
-    // Predefined locations and coordinates
+    /*// Predefined locations and coordinates
     private val locationOptions = arrayOf(
         "Softhouse Malmo",
         "Softhouse Karlskrona",
         "Softhouse Vaxjo"
     )
-
+*/
     private val locationCoordinates = mapOf(
-        "Softhouse Malmo" to LatLng(55.611331059590206, 13.002231964445214),
-        "Softhouse Karlskrona" to LatLng(56.18320240744998, 15.593305575774751),
-        "Softhouse Vaxjo" to LatLng(56.87750939887021, 14.808042591619134)
+        "Malmö" to LatLng(55.611331059590206, 13.002231964445214),
+        "Karlskrona" to LatLng(56.18320240744998, 15.593305575774751),
+        "Växjö" to LatLng(56.87750939887021, 14.808042591619134),
+        "Stockholm" to LatLng(59.33887571833381, 18.057613734616805),
+        "Karlshamn" to LatLng(56.16464684268269, 14.866310010348741),
+        "Kalmar" to LatLng(56.66415607872528, 16.37026323525738),
+        "Jönköping" to LatLng(57.78355698256043, 14.164313337394715),
+        "Luleå" to LatLng(65.58116493400121, 22.148896566956076),
+        "Uppsala" to LatLng(59.85965384178488, 17.636767367327494),
+        "Sarajevo" to LatLng(43.84662503289982, 18.35077154879623),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,7 +86,7 @@ class ResturantListActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun showLocationSelectionDialog() {
+    private fun showLocationSelectionDialog() { /*
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Select Location")
 
@@ -90,18 +98,20 @@ class ResturantListActivity : AppCompatActivity() {
         builder.setView(spinner)
 
         builder.setPositiveButton("OK") { dialog, _ ->
-            val selectedLocation = spinner.selectedItem.toString()
+            val selectedLocation = spinner.selectedItem.toString() */
+
+            val selectedLocation = chaneloc
             val latLng = locationCoordinates[selectedLocation]
 
             if (latLng != null) {
                 // Now call the API to fetch restaurants based on the selected location
                 searchNearbyRestaurants(latLng)
-            }
-            dialog.dismiss()
+           // }
+            //dialog.dismiss()
         }
 
-        builder.setCancelable(false)
-        builder.show()
+        //builder.setCancelable(false)
+        //builder.show()
     }
 
     private fun searchNearbyRestaurants(location: LatLng) {
