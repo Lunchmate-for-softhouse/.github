@@ -26,6 +26,8 @@ fun MainPage(navController: NavController, username: String) {}
     var expanded by remember { mutableStateOf(false) }
     val locations = listOf("Karlskrona", "Stockholm", "Malmö", "Gothenburg")
 
+    
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween

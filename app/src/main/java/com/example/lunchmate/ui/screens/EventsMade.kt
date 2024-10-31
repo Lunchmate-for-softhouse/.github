@@ -90,7 +90,7 @@ fun EventsMade(navController: NavController, creatorName: String) {
             Spacer(modifier = Modifier.height(16.dp))
 
             var expanded by remember { mutableStateOf(false) }
-            val locations = listOf("Stockholm", "Malmö", "Växjö", "Karlskrona", "Karlshamn", "Göteborg")
+            val locations = listOf("Stockholm", "Malmö", "Växjö", "Karlskrona", "Karlshamn", "Kalmar","Jönköping","Luleå","Uppsala","Sarajevo")
 
             Box(modifier = Modifier.fillMaxWidth()) {
                 TextButton(
