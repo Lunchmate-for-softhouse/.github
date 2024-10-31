@@ -360,7 +360,7 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
             val username = backStackEntry.arguments?.getString("username")
             if (username != null) {
                 userstore = username
-                MainPage(navController, username)
+                EventsMade(navController, username)
             }
         }
             composable("current_events") {
