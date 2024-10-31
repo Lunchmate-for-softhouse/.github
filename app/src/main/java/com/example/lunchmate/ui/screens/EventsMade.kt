@@ -24,6 +24,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.ui.text.font.FontWeight
 
+var nameofevent= ""
 
 @Composable
 fun EventsMade(navController: NavController, creatorName: String) {
@@ -152,6 +153,7 @@ fun EventItem(event: Event, navController: NavController) {
     val eventDateTime = "${event.eventDate} ${event.eventTime}"
     val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
 
+
     // Timer logic to update remaining time
     LaunchedEffect(eventDateTime) {
         while (true) {
@@ -200,7 +202,8 @@ fun EventItem(event: Event, navController: NavController) {
                     modifier = Modifier
                         .weight(1f)
                         .clickable {
-                            navController.navigate("your_event_detail_route/${event.eventName}") // Leave this empty for now
+                            nameofevent = event.eventName
+                            navController.navigate("event_details") // Leave this empty for now
                         }
                 )
                 // Menu button
@@ -321,7 +324,7 @@ fun EventCreatorItem(event: Event, navController: NavController) {
                     modifier = Modifier
                         .weight(1f)
                         .clickable {
-                            navController.navigate("your_event_detail_route/${event.eventName}") // Leave this empty for now
+                            navController.navigate("event_details/${event.eventName}") // Leave this empty for now
                         }
                 )
             }

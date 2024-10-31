@@ -107,11 +107,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import com.example.lunchmate.com.example.lunchmate.ui.screens.EventDetails
 import com.example.lunchmate.com.example.lunchmate.ui.screens.ReviewPage
 import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.EventsMade
 import com.example.lunchmate.ui.screens.ReviewNotificationWorker
 import com.example.lunchmate.ui.screens.chaneloc
+import com.example.lunchmate.ui.screens.nameofevent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -340,6 +342,7 @@ class MainActivity : ComponentActivity() {
 fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
     var userstore = ""
 
+
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "home") {
@@ -380,6 +383,10 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
 
         composable("create_event"){
             CreateEvents(navController = navController, chaneloc, userstore)
+        }
+
+        composable("event_details"){
+            EventDetails(navController = navController, nameofevent)
         }
 
         // Add the ReviewPage composable
