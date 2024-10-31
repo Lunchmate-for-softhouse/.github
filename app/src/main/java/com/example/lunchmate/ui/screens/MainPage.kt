@@ -20,9 +20,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 var chaneloc =""
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainPage(navController: NavController, username: String) {
+fun MainPage(navController: NavController, username: String) {}
 
-    var location by remember { mutableStateOf("Karlskrona") }
+    /*var location by remember { mutableStateOf("Karlskrona") }
     var expanded by remember { mutableStateOf(false) }
     val locations = listOf("Karlskrona", "Stockholm", "Malmö", "Gothenburg")
 
@@ -116,3 +116,4 @@ fun MainPage(navController: NavController, username: String) {
         BottomNavBar(navController = navController)
     }
 }
+*/

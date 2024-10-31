@@ -79,6 +79,7 @@ class EventManager {
 
         return eventsList
         }
+
     fun deleteEvent(event: Event) {
 
     }

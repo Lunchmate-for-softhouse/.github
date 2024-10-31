@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.ui.Modifier
@@ -23,7 +22,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-
+import androidx.compose.ui.text.font.FontWeight
 
 
 @Composable
@@ -34,18 +33,19 @@ fun EventsMade(navController: NavController, creatorName: String) {
     var selectedLocation by remember { mutableStateOf("Stockholm") } // Default selected location
     val eventManager = EventManager() // Instantiate EventManager
 
-    // Start listening for events when the composable is launched
+    // Debugging: Log when events are fetched
     LaunchedEffect(Unit) {
-        // Fetch initial events
         try {
             val events = eventManager.fetchAndCleanEvents()
             events.forEach { event ->
                 if (!eventsList.contains(event)) {
-                    eventsList.add(event) // Add only if it doesn't exist
+                    eventsList.add(event)
+                    println("Event fetched: ${event.eventName} at ${event.location}")
                 }
             }
         } catch (e: Exception) {
             errorMessage = e.message ?: "Unknown error"
+            println("Error fetching events: $errorMessage")
         } finally {
             isLoading = false
         }
@@ -55,7 +55,8 @@ fun EventsMade(navController: NavController, creatorName: String) {
         eventManager.startListeningForEvents { newEvents ->
             newEvents.forEach { event ->
                 if (!eventsList.contains(event)) {
-                    eventsList.add(event) // Add only if it doesn't exist
+                    eventsList.add(event)
+                    println("New event detected: ${event.eventName} at ${event.location}")
                 }
             }
         }
@@ -72,7 +73,6 @@ fun EventsMade(navController: NavController, creatorName: String) {
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            // Greeting line for the creator
             Text(
                 text = "Hello $creatorName!",
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 20.sp),
@@ -81,7 +81,6 @@ fun EventsMade(navController: NavController, creatorName: String) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Updated statement
             Text(
                 text = "Where do you want to eat today?",
                 style = MaterialTheme.typography.titleLarge.copy(fontSize = 24.sp),
@@ -90,7 +89,6 @@ fun EventsMade(navController: NavController, creatorName: String) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Dropdown menu for selecting location
             var expanded by remember { mutableStateOf(false) }
             val locations = listOf("Stockholm", "Malmö", "Växjö", "Karlskrona", "Karlshamn", "Göteborg")
 
@@ -99,7 +97,7 @@ fun EventsMade(navController: NavController, creatorName: String) {
                     onClick = { expanded = true },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Selected Location: $selectedLocation") // Display selected location
+                    Text("Selected Location: $selectedLocation")
                 }
 
                 DropdownMenu(
@@ -110,9 +108,10 @@ fun EventsMade(navController: NavController, creatorName: String) {
                         DropdownMenuItem(
                             text = { Text(loc) },
                             onClick = {
-                                selectedLocation = loc // Update selected location
+                                selectedLocation = loc
                                 chaneloc = selectedLocation
-                                expanded = false // Close menu
+                                expanded = false
+                                println("Selected location: $selectedLocation")
                             }
                         )
                     }
@@ -124,18 +123,16 @@ fun EventsMade(navController: NavController, creatorName: String) {
             when {
                 isLoading -> CircularProgressIndicator()
                 errorMessage.isNotEmpty() -> Text(errorMessage, color = Color.Red)
-                eventsList.isEmpty() -> Text("No events available")
+                eventsList.none { it.location == selectedLocation } -> Text("No events available for $selectedLocation")
                 else -> {
                     LazyColumn {
-                        items(eventsList) { event ->
-                            // Check if the current user is the creator of the event
+                        items(eventsList.filter { it.location == selectedLocation }) { event ->
                             if (event.createdBy == creatorName) {
-                                // Render creator view with the creator's name
                                 EventCreatorItem(event, navController)
                             } else {
-                                // Render attendee view
                                 EventItem(event, navController)
                             }
+                            println("Displaying event: ${event.eventName} at ${event.location}")
                         }
                     }
                 }
@@ -143,6 +140,9 @@ fun EventsMade(navController: NavController, creatorName: String) {
         }
     }
 }
+
+
+
 
 
 
@@ -213,6 +213,18 @@ fun EventItem(event: Event, navController: NavController) {
                     Text("Menu")
                 }
             }
+
+            // Add event description below the event name
+            Text(
+                text = event.eventDescription, // Assuming event has a description property
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold // Make the text bold
+                ),
+                color = Color.Black, // Change the color to black for better visibility
+                modifier = Modifier.padding(bottom = 8.dp) // Space between description and other elements
+            )
+
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(imageVector = Icons.Filled.CalendarToday, contentDescription = "Event Date")
                 Spacer(modifier = Modifier.width(4.dp))
@@ -250,6 +262,8 @@ fun EventItem(event: Event, navController: NavController) {
         }
     }
 }
+
+
 
 @Composable
 fun EventCreatorItem(event: Event, navController: NavController) {
@@ -311,6 +325,17 @@ fun EventCreatorItem(event: Event, navController: NavController) {
                         }
                 )
             }
+            // Add event description below the event name
+            Text(
+                text = event.eventDescription, // Assuming event has a description property
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold // Make the text bold
+                ),
+                color = Color.Black, // Change the color to black for better visibility
+                modifier = Modifier.padding(bottom = 8.dp) // Space between description and other elements
+            )
+
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(imageVector = Icons.Filled.CalendarToday, contentDescription = "Event Date")
                 Spacer(modifier = Modifier.width(4.dp))
@@ -357,7 +382,7 @@ data class Event(
     val eventName: String = "",
     val eventDate: String = "",
     val eventTime: String = "",
-    val eventLocation: String = "",
+    val location: String = "",
     val eventDescription: String = "",
     val createdBy: String = "",
     val pickupDineIn: String = "",
