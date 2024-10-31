@@ -14,30 +14,50 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+
+
 
 @Composable
-fun EventsMade(navController: NavController,creatorName: String) {
+fun EventsMade(navController: NavController, creatorName: String) {
     val eventsList = remember { mutableStateListOf<Event>() }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
+    var selectedLocation by remember { mutableStateOf("Stockholm") } // Default selected location
     val eventManager = EventManager() // Instantiate EventManager
 
-    // Fetch and clean up events from Firestore
+    // Start listening for events when the composable is launched
     LaunchedEffect(Unit) {
+        // Fetch initial events
         try {
-            eventsList.clear()
-            val events = eventManager.fetchAndCleanEvents() // Use the new method
-            eventsList.addAll(events)
+            val events = eventManager.fetchAndCleanEvents()
+            events.forEach { event ->
+                if (!eventsList.contains(event)) {
+                    eventsList.add(event) // Add only if it doesn't exist
+                }
+            }
         } catch (e: Exception) {
             errorMessage = e.message ?: "Unknown error"
         } finally {
             isLoading = false
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        eventManager.startListeningForEvents { newEvents ->
+            newEvents.forEach { event ->
+                if (!eventsList.contains(event)) {
+                    eventsList.add(event) // Add only if it doesn't exist
+                }
+            }
         }
     }
 
@@ -61,7 +81,43 @@ fun EventsMade(navController: NavController,creatorName: String) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("Created Events", style = MaterialTheme.typography.titleLarge.copy(fontSize = 24.sp))
+            // Updated statement
+            Text(
+                text = "Where do you want to eat today?",
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 24.sp),
+                color = Color.Black
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Dropdown menu for selecting location
+            var expanded by remember { mutableStateOf(false) }
+            val locations = listOf("Stockholm", "Malmö", "Växjö", "Karlskrona", "Karlshamn", "Göteborg")
+
+            Box(modifier = Modifier.fillMaxWidth()) {
+                TextButton(
+                    onClick = { expanded = true },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Selected Location: $selectedLocation") // Display selected location
+                }
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    locations.forEach { loc ->
+                        DropdownMenuItem(
+                            text = { Text(loc) },
+                            onClick = {
+                                selectedLocation = loc // Update selected location
+                                chaneloc = selectedLocation
+                                expanded = false // Close menu
+                            }
+                        )
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -75,7 +131,7 @@ fun EventsMade(navController: NavController,creatorName: String) {
                             // Check if the current user is the creator of the event
                             if (event.createdBy == creatorName) {
                                 // Render creator view with the creator's name
-                                EventCreatorItem(event, navController, creatorName)
+                                EventCreatorItem(event, navController)
                             } else {
                                 // Render attendee view
                                 EventItem(event, navController)
@@ -87,6 +143,8 @@ fun EventsMade(navController: NavController,creatorName: String) {
         }
     }
 }
+
+
 
 @Composable
 fun EventItem(event: Event, navController: NavController) {
@@ -194,8 +252,38 @@ fun EventItem(event: Event, navController: NavController) {
 }
 
 @Composable
-fun EventCreatorItem(event: Event, navController: NavController, creatorName: String) {
-    // Similar to EventItem but with creator-specific functionality
+fun EventCreatorItem(event: Event, navController: NavController) {
+    var remainingTime by remember { mutableStateOf("Loading...") }
+    val eventDateTime = "${event.eventDate} ${event.eventTime}"
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+    val eventManager = EventManager() // Instantiate EventManager
+
+
+    // Timer logic to update remaining time
+    LaunchedEffect(eventDateTime) {
+        while (true) {
+            try {
+                val eventTime = dateFormat.parse(eventDateTime) ?: Date()
+                val currentTime = Date()
+                val timeDiff = eventTime.time - currentTime.time
+
+                if (timeDiff > 0) {
+                    val hours = (timeDiff / (1000 * 60 * 60)).toInt()
+                    val minutes = ((timeDiff / (1000 * 60)) % 60).toInt()
+                    val seconds = ((timeDiff / 1000) % 60).toInt()
+                    remainingTime = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+                } else {
+                    remainingTime = "Event ended"
+                    break // Stop updating if the event has passed
+                }
+            } catch (e: Exception) {
+                remainingTime = "Invalid date"
+                break
+            }
+            delay(1000) // Update every second
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -207,27 +295,53 @@ fun EventCreatorItem(event: Event, navController: NavController, creatorName: St
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            // Greeting line for the creator
-            Text(
-                text = "Hello $creatorName!",
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 20.sp),
-                color = Color.Black
-            )
-            // Event details
-            Text(event.eventName, style = MaterialTheme.typography.titleMedium.copy(fontSize = 22.sp), color = Color.Black)
-            Text("Created by: ${event.createdBy}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
-
-            // Add additional options for the creator, like editing or deleting the event
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Clickable event name
+                Text(
+                    text = event.eventName,
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 22.sp),
+                    color = Color.Black,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable {
+                            navController.navigate("your_event_detail_route/${event.eventName}") // Leave this empty for now
+                        }
+                )
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(imageVector = Icons.Filled.CalendarToday, contentDescription = "Event Date")
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Date: ${event.eventDate}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(imageVector = Icons.Filled.Person, contentDescription = "People Count")
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("People: ${event.peopleCount}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
+            }
+            // Display pickup or dine-in option
+            Text("Option: ${if (event.pickupDineIn == "Pickup") "Pickup" else "Dine In"}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
+
+            // Display the remaining time
+            Text("Time Left: $remainingTime", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
+
+            // Buttons for creator functionality
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly // Evenly space the buttons
             ) {
                 Button(onClick = { /* Handle Edit Event */ }) {
                     Text("Edit")
                 }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = { /* Handle Delete Event */ }) {
+                Button(onClick = { eventManager.deleteEvent(event) }) {
                     Text("Delete")
+                }
+                Button(onClick = { /* Handle Set ETA */ }) {
+                    Text("Set ETA")
                 }
             }
         }
@@ -236,7 +350,9 @@ fun EventCreatorItem(event: Event, navController: NavController, creatorName: St
 
 
 
-// Data class for events
+
+
+
 data class Event(
     val eventName: String = "",
     val eventDate: String = "",
@@ -246,4 +362,18 @@ data class Event(
     val createdBy: String = "",
     val pickupDineIn: String = "",
     val peopleCount: Int = 0 // Added people count field
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Event) return false
+
+        return eventName == other.eventName &&
+                eventDate == other.eventDate &&
+                eventTime == other.eventTime &&
+                createdBy == other.createdBy
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(eventName, eventDate, eventTime, createdBy)
+    }
+}
