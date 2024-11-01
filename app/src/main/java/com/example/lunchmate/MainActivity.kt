@@ -385,7 +385,9 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
             CreateEvents(navController = navController, chaneloc, userstore)
         }
 
-        composable("event_details"){
+        // keep this same.
+        composable("event_details")
+        {
             EventDetails(navController = navController, nameofevent)
         }
 
