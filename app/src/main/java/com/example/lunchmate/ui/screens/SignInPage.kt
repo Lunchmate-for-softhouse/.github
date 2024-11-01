@@ -1,17 +1,13 @@
 package com.example.lunchmate.ui.screens
 
 import android.app.Activity
-import android.content.Intent
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -30,10 +26,9 @@ fun SignInPage(navController: NavController, activity: Activity) {
     var password by remember { mutableStateOf("") }
     var loginStatus by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    val authRepository = AuthRepository(activity)
     val db = FirebaseFirestore.getInstance()
     val scope = rememberCoroutineScope()
-
-    val authRepository = AuthRepository(activity)
 
     // Launcher for Google Sign-In Intent
     val googleSignInLauncher = rememberLauncherForActivityResult(
@@ -45,23 +40,13 @@ fun SignInPage(navController: NavController, activity: Activity) {
                 val account: GoogleSignInAccount? = task.getResult(Exception::class.java)
                 account?.let {
                     authRepository.firebaseAuthWithGoogle(
-                        it,
-                        onSuccess = {
-                            loginStatus = "Google Sign-In Successful!"
-                            // Store user in Firestore (username, password as GoogleAccount, location)
-                            val userMap = hashMapOf(
-                                "username" to account.displayName.orEmpty(),
-                                "password" to "GoogleAccount",
-                                "location" to "Malmö" // hardcoded location
-                            )
-                            db.collection("users").document(account.displayName.orEmpty())
-                                .set(userMap)
-                                .addOnSuccessListener {
-                                    navController.navigate("main_page/${account.displayName}")
-                                }
-                                .addOnFailureListener { e ->
-                                    loginStatus = "Firestore error: ${e.message}"
-                                }
+                        account = it,
+                        onUserExists = {
+                            loginStatus = "Welcome back, ${account.displayName}!"
+                            navController.navigate("main_page/${account.displayName}")
+                        },
+                        onUserDoesNotExist = { newAccount ->
+                            navController.navigate("google_registration_page/${newAccount.displayName}")
                         },
                         onFailure = { exception ->
                             loginStatus = "Google Sign-In Failed: ${exception.message}"
@@ -85,8 +70,7 @@ fun SignInPage(navController: NavController, activity: Activity) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+                .padding(16.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -95,50 +79,33 @@ fun SignInPage(navController: NavController, activity: Activity) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Username/Password Login
-                BasicTextField(
+                // Username field
+                TextField(
                     value = username,
                     onValueChange = { username = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    singleLine = true,
-                    decorationBox = { innerTextField ->
-                        if (username.isEmpty()) {
-                            Text(text = "Enter Username", color = Color.Gray)
-                        }
-                        innerTextField()
-                    }
+                    label = { Text("Username") },
+                    modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                BasicTextField(
+                // Password field
+                TextField(
                     value = password,
                     onValueChange = { password = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    singleLine = true,
+                    label = { Text("Password") },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    decorationBox = { innerTextField ->
-                        if (password.isEmpty()) {
-                            Text(text = "Enter Password", color = Color.Gray)
-                        }
-                        innerTextField()
-                    }
+                    modifier = Modifier.fillMaxWidth()
                 )
 
-                Text(
-                    text = if (passwordVisible) "Hide Password" else "Show Password",
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .clickable { passwordVisible = !passwordVisible },
-                    color = Color.Blue
-                )
+                // Password visibility toggle
+                TextButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Text(text = if (passwordVisible) "Hide Password" else "Show Password")
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Sign In Button (For username/password sign-in logic)
                 Button(
                     onClick = {
                         if (username.isEmpty() || password.isEmpty()) {
@@ -162,23 +129,20 @@ fun SignInPage(navController: NavController, activity: Activity) {
                                 }
                         }
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "Sign In")
                 }
 
-                // Google Sign-In Button
                 Spacer(modifier = Modifier.height(16.dp))
+
+                // Google Sign-In Button
                 Button(
                     onClick = {
                         val signInIntent = authRepository.getGoogleSignInIntent()
                         googleSignInLauncher.launch(signInIntent)
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "Sign In with Google")
                 }
@@ -187,7 +151,7 @@ fun SignInPage(navController: NavController, activity: Activity) {
                 Text(
                     text = loginStatus,
                     modifier = Modifier.padding(top = 16.dp),
-                    color = if (loginStatus.contains("Successful")) Color.Green else Color.Red
+                    color = if (loginStatus.contains("Welcome")) Color.Green else Color.Red
                 )
             }
         }

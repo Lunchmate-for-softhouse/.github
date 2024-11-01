@@ -9,6 +9,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 
 class AuthRepository(private val activity: Activity) {
 
@@ -24,17 +25,29 @@ class AuthRepository(private val activity: Activity) {
         return GoogleSignIn.getClient(activity, gso)
     }
 
-    // Authenticate with Firebase using the Google account
+    // Authenticate with Firebase using the Google account and check Firestore for existing user
     fun firebaseAuthWithGoogle(
         account: GoogleSignInAccount?,
-        onSuccess: () -> Unit,
+        onUserExists: () -> Unit,
+        onUserDoesNotExist: (GoogleSignInAccount) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
         val credential = GoogleAuthProvider.getCredential(account?.idToken, null)
         firebaseAuth.signInWithCredential(credential)
             .addOnCompleteListener(activity) { task ->
                 if (task.isSuccessful) {
-                    onSuccess()
+                    val userId = firebaseAuth.currentUser?.uid ?: return@addOnCompleteListener
+                    // Check if user already exists in Firestore
+                    FirebaseFirestore.getInstance().collection("users").document(userId)
+                        .get()
+                        .addOnSuccessListener { document ->
+                            if (document.exists()) {
+                                onUserExists()
+                            } else {
+                                account?.let { onUserDoesNotExist(it) }
+                            }
+                        }
+                        .addOnFailureListener { onFailure(it) }
                 } else {
                     task.exception?.let { onFailure(it) }
                 }

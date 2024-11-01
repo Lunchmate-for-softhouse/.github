@@ -5,15 +5,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import com.example.lunchmate.ui.screens.GoogleRegistrationPage
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.NavType
 import com.example.lunchmate.ui.screens.*
 import com.example.lunchmate.ui.theme.LunchMateTheme
 import com.google.firebase.FirebaseApp
@@ -55,20 +56,28 @@ fun MainAppNavHost(activity: MainActivity) {
             SignInPage(navController = navController, activity = activity) // Pass activity to SignInPage
         }
 
-        // Register page route
+        // Home page route
         composable("register") {
-            RegisterPage(navController = navController) // Register screen
+            RegisterPage(navController = navController)
         }
+
+        // Google Registration page
+        composable(
+            route = "google_registration_page/{username}", // Matches navigate call's path
+            arguments = listOf(navArgument("username") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val username = backStackEntry.arguments?.getString("username") ?: ""
+            GoogleRegistrationPage(navController = navController, username = username)
+        }
+
 
         // Main page route with username argument
         composable(
             route = "main_page/{username}",
             arguments = listOf(navArgument("username") { type = NavType.StringType })
         ) { backStackEntry ->
-            val username = backStackEntry.arguments?.getString("username")
-            if (username != null) {
-                MainPage(navController = navController, username = username)
-            }
+            val username = backStackEntry.arguments?.getString("username") ?: ""
+            MainPage(navController = navController, username = username)
         }
     }
 }
