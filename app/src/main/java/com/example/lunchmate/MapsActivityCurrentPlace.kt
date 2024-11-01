@@ -67,6 +67,9 @@ class MapsActivityCurrentPlace : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.map = googleMap
+        //map?.uiSettings?.isZoomGesturesEnabled = true // Enable zoom gestures
+        map?.uiSettings?.isZoomGesturesEnabled = true
+        map?.uiSettings?.isZoomControlsEnabled = true
         showLocationSelectionDialog()
     }
 
@@ -132,14 +135,14 @@ class MapsActivityCurrentPlace : AppCompatActivity(), OnMapReadyCallback {
                                 place.getJSONObject("geometry").getJSONObject("location").getDouble("lng")
                             )
                             val placeName = place.getString("name")
-                            val placeAddress = place.optString("vicinity", "No address available")
+                            //val placeAddress = place.optString("vicinity", "No address available")
 
                             // Add a marker with the scaled custom icon
                             map?.addMarker(
                                 MarkerOptions()
                                     .position(latLng)
                                     .title(placeName)
-                                    .snippet(placeAddress)
+                                   // .snippet(placeAddress)
                                     .icon(customMarker)
                             )
                         }
