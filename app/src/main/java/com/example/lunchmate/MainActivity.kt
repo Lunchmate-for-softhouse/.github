@@ -359,10 +359,14 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
         // Composable for EventPage with dynamic restaurantName argument
         composable(
             route = "event_page/{restaurantName}",
-            arguments = listOf(navArgument("restaurantName") { type = NavType.StringType })
+            arguments = listOf(
+                navArgument("restaurantName") { type = NavType.StringType },
+                navArgument("creatorName") { type = NavType.StringType }
+            )
         ) { backStackEntry ->
             val restaurantName = backStackEntry.arguments?.getString("restaurantName") ?: "Unknown Restaurant"
-            EventPage(navController = navController, restaurantName = restaurantName, context = context) // Pass context here
+            val creatorName = backStackEntry.arguments?.getString("creatorName") ?: "User"
+            EventPage(navController, creatorName, restaurantName)
         }
 
         // Add the ReviewPage composable
