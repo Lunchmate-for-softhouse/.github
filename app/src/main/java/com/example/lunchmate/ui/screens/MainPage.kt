@@ -160,17 +160,13 @@ fun MainPage(navController: NavController, username: String) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Button to navigate to the SwishPage
             Button(
                 onClick = {
-                    Log.d("SwishPaymentButton", "Pay with Swish button clicked")
-                    makeSwishPaymentRequest(context) // Call the payment function
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF00C300) // Swish green color
-                ),
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                    navController.navigate("swish") // Navigate to SwishPage
+                }
             ) {
-                Text(text = "Pay with Swish", color = Color.White)
+                Text(text = "Open Swish")
             }
 
         }

@@ -4,49 +4,63 @@ import android.content.Context
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import com.example.lunchmate.R
-import java.io.IOException
 import java.io.InputStream
 import java.security.KeyStore
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.X509TrustManager
-import android.util.Log
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import android.util.Log
+import java.io.IOException
+import java.security.cert.CertificateFactory
 
+// Function to create OkHttp client with Swish client certificate
 fun createSwishOkHttpClient(context: Context): OkHttpClient {
-    // Load client certificate from resources
-    val keyStore = KeyStore.getInstance("PKCS12").apply {
-        val certInputStream: InputStream = context.resources.openRawResource(R.raw.certificate)
-        load(certInputStream, "your_certificate_password".toCharArray())
-        certInputStream.close()
+    try {
+        // Load the client certificate from res/raw
+        val keyStore = KeyStore.getInstance("PKCS12").apply {
+            val certInputStream: InputStream = context.resources.openRawResource(R.raw.certificate) // Your client certificate
+            load(certInputStream, "123456".toCharArray()) // Your client certificate password
+            certInputStream.close()
+        }
+
+        // Load CA certificate from res/raw (replace with your actual CA cert filename)
+        val caInputStream: InputStream = context.resources.openRawResource(R.raw.swish_ca_certificate) // Your CA certificate
+        val caKeyStore = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
+            load(null, null) // Create an empty KeyStore
+            setCertificateEntry("ca", CertificateFactory.getInstance("X.509").generateCertificate(caInputStream))
+        }
+        caInputStream.close()
+
+        // Initialize TrustManager with the CA certificate
+        val trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+        trustManagerFactory.init(caKeyStore)
+
+        // Initialize KeyManager with the client certificate
+        val keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
+        keyManagerFactory.init(keyStore, "123456".toCharArray()) // Your client certificate password
+
+        // Create SSLContext with both KeyManager and TrustManager
+        val sslContext = SSLContext.getInstance("TLSv1.2").apply {
+            init(keyManagerFactory.keyManagers, trustManagerFactory.trustManagers, null)
+        }
+
+        val trustManager = trustManagerFactory.trustManagers[0] as X509TrustManager
+
+        // Build the OkHttpClient with SSL settings
+        return OkHttpClient.Builder()
+            .sslSocketFactory(sslContext.socketFactory, trustManager)
+            .build()
+    } catch (e: Exception) {
+        Log.e("SwishPayment", "Error initializing SSL context: ${e.message}", e)
+        throw RuntimeException("Failed to create OkHttpClient with Swish certificate")
     }
-
-    // Set up key manager with client certificate
-    val keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
-    keyManagerFactory.init(keyStore, "your_certificate_password".toCharArray())
-
-    // Set up trust manager with CA certificate
-    val trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
-    trustManagerFactory.init(keyStore)
-
-    // Create SSL context with both managers
-    val sslContext = SSLContext.getInstance("TLS").apply {
-        init(keyManagerFactory.keyManagers, trustManagerFactory.trustManagers, null)
-    }
-
-
-    val trustManager = trustManagerFactory.trustManagers[0] as X509TrustManager
-
-    // Build the OkHttpClient
-    return OkHttpClient.Builder()
-        .sslSocketFactory(sslContext.socketFactory, trustManager)
-        .build()
-
 }
 
+// Function to make the Swish payment request
 fun makeSwishPaymentRequest(context: Context) {
     try {
         Log.d("SwishPaymentRequest", "Creating OkHttpClient")
@@ -58,8 +72,8 @@ fun makeSwishPaymentRequest(context: Context) {
                 "payeeAlias": "1231181189",
                 "amount": "100",
                 "currency": "SEK",
-                "message": "Payment for Order #12345",
-                "callbackUrl": "https://yourcallbackurl.com/paymentcallback"
+                "message": "Payment for Order #12345", 
+                "callbackUrl": "https://yourcallbackurl.com/paymentcallback" // Your callback URL
             }
         """.trimIndent()
 
@@ -69,7 +83,7 @@ fun makeSwishPaymentRequest(context: Context) {
 
         // Build the request with the JSON body
         val request = Request.Builder()
-            .url("https://mss.swish.test.example.com/paymentrequests")  // Replace with actual test URL
+            .url("https://mss.cpc.getswish.net/swish-cpcapi/paymentrequests")  // Swish API URL
             .post(requestBody)  // Add the JSON body here
             .build()
 
@@ -98,5 +112,3 @@ fun makeSwishPaymentRequest(context: Context) {
         Log.e("SwishPayment", "Error in making payment request: ${e.message}", e)
     }
 }
-
-

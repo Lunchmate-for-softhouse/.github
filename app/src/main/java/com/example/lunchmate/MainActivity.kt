@@ -79,5 +79,10 @@ fun MainAppNavHost(activity: MainActivity) {
             val username = backStackEntry.arguments?.getString("username") ?: ""
             MainPage(navController = navController, username = username)
         }
+
+        composable("swish") {
+            SwishPage(navController = navController, context = activity)
+        }
+
     }
 }
