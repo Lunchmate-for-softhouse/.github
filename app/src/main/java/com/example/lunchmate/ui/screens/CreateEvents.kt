@@ -1,14 +1,13 @@
 package com.example.lunchmate.ui.screens
 
 import BottomNavBar
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,17 +19,20 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.lunchmate.saveEvent
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CreateEvents(navController: NavController, Location: String, userName: String) {
     val fontSize = 16.sp
     val textColour = Color.Black
+    val context = LocalContext.current
 
     // Mutable state for event details
     var eventName by remember { mutableStateOf("") }
-    var eventDate by remember { mutableStateOf("") }
-    var eventTime by remember { mutableStateOf("") }
+    var eventDate by remember { mutableStateOf(getFormattedDate()) }
+    var eventTime by remember { mutableStateOf(getFormattedTime()) }
     var eventDescription by remember { mutableStateOf("") }
     val createdBy = userName // Set username as constant
     val location = Location // Set location as constant
@@ -40,6 +42,34 @@ fun CreateEvents(navController: NavController, Location: String, userName: Strin
     // Snackbar host state
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+
+    // Show DatePicker
+    val showDatePicker = {
+        val calendar = Calendar.getInstance()
+        DatePickerDialog(
+            context,
+            { _, year, month, day ->
+                eventDate = String.format("%02d/%02d/%d", day, month + 1, year)
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+
+    // Show TimePicker
+    val showTimePicker = {
+        val calendar = Calendar.getInstance()
+        TimePickerDialog(
+            context,
+            { _, hour, minute ->
+                eventTime = String.format("%02d:%02d", hour, minute)
+            },
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            true
+        ).show()
+    }
 
     // Layout using Scaffold to support Snackbar
     Scaffold(
@@ -70,8 +100,8 @@ fun CreateEvents(navController: NavController, Location: String, userName: Strin
                 Spacer(modifier = Modifier.height(8.dp))
                 TextFieldWithLabel(
                     value = eventName,
-                    onValueChange = { newValue -> eventName = newValue },
-                    placeholder = "Enter Restaurant Name"
+                    onValueChange = { eventName = it },
+                    placeholder = "Enter restaurant name"
                 )
 
                 Spacer(modifier = Modifier.height(22.dp))
@@ -81,8 +111,8 @@ fun CreateEvents(navController: NavController, Location: String, userName: Strin
                 Spacer(modifier = Modifier.height(8.dp))
                 TextFieldWithLabel(
                     value = eventDescription,
-                    onValueChange = { newValue -> eventDescription = newValue },
-                    placeholder = "Give A comment"
+                    onValueChange = { eventDescription = it },
+                    placeholder = "Give a comment"
                 )
 
                 Spacer(modifier = Modifier.height(22.dp))
@@ -99,12 +129,12 @@ fun CreateEvents(navController: NavController, Location: String, userName: Strin
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Button(onClick = { /* Show Date Input */ }) {
+                        Button(onClick = showDatePicker) {
                             Text("Select Date")
                         }
                         TextFieldWithLabel(
                             value = eventDate,
-                            onValueChange = { newValue -> eventDate = newValue },
+                            onValueChange = {},
                             placeholder = "DD/MM/YYYY"
                         )
                     }
@@ -116,12 +146,12 @@ fun CreateEvents(navController: NavController, Location: String, userName: Strin
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Button(onClick = { /* Show Time Input */ }) {
+                        Button(onClick = showTimePicker) {
                             Text("Select Time")
                         }
                         TextFieldWithLabel(
                             value = eventTime,
-                            onValueChange = { newValue -> eventTime = newValue },
+                            onValueChange = {},
                             placeholder = "HH:MM"
                         )
                     }
@@ -226,8 +256,6 @@ fun CreateEvents(navController: NavController, Location: String, userName: Strin
     )
 }
 
-
-
 // Helper function for labeled text fields
 @Composable
 fun TextFieldWithLabel(value: String, onValueChange: (String) -> Unit, placeholder: String) {
@@ -238,11 +266,20 @@ fun TextFieldWithLabel(value: String, onValueChange: (String) -> Unit, placehold
             .fillMaxWidth()
             .background(Color.White)
             .padding(8.dp),
-        decorationBox = { innerTextField -> // Added decorationBox to show placeholder
+        decorationBox = { innerTextField ->
             if (value.isEmpty()) {
                 Text(text = placeholder, color = Color.Gray)
             }
             innerTextField()
         }
     )
+}
+fun getFormattedDate(): String {
+    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    return sdf.format(Date())
+}
+
+fun getFormattedTime(): String {
+    val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+    return sdf.format(Date())
 }

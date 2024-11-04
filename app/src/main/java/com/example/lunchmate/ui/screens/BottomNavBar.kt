@@ -108,7 +108,7 @@ fun BottomNavBar(
         Box(
             modifier = Modifier
                 .weight(1f)
-                .clickable { navController.navigate("review_pag") }
+                .clickable { navController.navigate("reviews") }
                 .padding(8.dp),
             contentAlignment = Alignment.Center
         ) {

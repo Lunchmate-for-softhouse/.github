@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 
 var nameofevent= ""
 
+
 @Composable
 fun EventsMade(navController: NavController, creatorName: String) {
     val eventsList = remember { mutableStateListOf<Event>() }
@@ -134,6 +135,7 @@ fun EventsMade(navController: NavController, creatorName: String) {
                                 EventItem(event, navController)
                             }
                             println("Displaying event: ${event.eventName} at ${event.location}")
+                            nameofevent = event.eventName
                         }
                     }
                 }
@@ -202,8 +204,8 @@ fun EventItem(event: Event, navController: NavController) {
                     modifier = Modifier
                         .weight(1f)
                         .clickable {
-                            nameofevent = event.eventName
-                            navController.navigate("events_detail") // Leave this empty for now
+
+                            navController.navigate("event_details") // Leave this empty for now
                         }
                 )
                 // Menu button
@@ -253,7 +255,7 @@ fun EventItem(event: Event, navController: NavController) {
             ) {
                 Button(
                     onClick = {
-                        navController.navigate("your_join_event_route/${event.eventName}") // Update with actual route
+                        navController.navigate("event_page") // Update with actual route
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50), contentColor = Color.White)
                 ) {
@@ -301,6 +303,8 @@ fun EventCreatorItem(event: Event, navController: NavController) {
         }
     }
 
+
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -316,6 +320,7 @@ fun EventCreatorItem(event: Event, navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 // Clickable event name
                 Text(
                     text = event.eventName,
@@ -324,7 +329,7 @@ fun EventCreatorItem(event: Event, navController: NavController) {
                     modifier = Modifier
                         .weight(1f)
                         .clickable {
-                            navController.navigate("events_detail") // Leave this empty for now
+                            navController.navigate("event_details") // Leave this empty for now
                         }
                 )
             }
