@@ -101,9 +101,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.example.lunchmate.com.example.lunchmate.ui.screens.EventDetails
 import com.example.lunchmate.ui.screens.CreateEvents
-import com.example.lunchmate.ui.screens.EventPage
+//import com.example.lunchmate.ui.screens.EventPage
 import com.example.lunchmate.ui.screens.EventsMade
-//import com.example.lunchmate.ui.screens.Reviews
+import com.example.lunchmate.ui.screens.Reviews
 import com.example.lunchmate.ui.screens.ReviewNotificationWorker
 import com.example.lunchmate.ui.screens.chaneloc
 import com.example.lunchmate.ui.screens.nameofevent
@@ -357,17 +357,17 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
             EventsMade(navController = navController, creatorName = creatorName)
         }
 
-//        composable(
-//            route = "event_page/{restaurantName}",
-//            arguments = listOf(navArgument("restaurantName") { type = NavType.StringType })
-//        ) { backStackEntry ->
-//            val restaurantName =
-//                backStackEntry.arguments?.getString("restaurantName") ?: "Unknown Restaurant"
-//        }
-
-        composable("event_page") {
-            EventPage(navController = navController,userstore, nameofevent)
+        composable(
+            route = "event_page/{restaurantName}",
+            arguments = listOf(navArgument("restaurantName") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val restaurantName =
+                backStackEntry.arguments?.getString("restaurantName") ?: "Unknown Restaurant"
         }
+
+//        composable("event_page") {
+//            EventPage(navController = navController,userstore)
+//        }
 
 
         composable("create_event") {
@@ -376,6 +376,9 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
 
         composable("event_details") {
             EventDetails(navController = navController, nameofevent)
+        }
+        composable("reviews") {
+            Reviews(navController = navController)
         }
 
         // Add Reviews as a composable with route "reviews"

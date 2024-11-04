@@ -1,4 +1,4 @@
-package com.example.lunchmate.com.example.lunchmate.ui.screens
+/*package com.example.lunchmate.com.example.lunchmate.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
@@ -163,3 +163,7 @@ fun StarRating(rating: Int, onRatingChanged: (Int) -> Unit) {
         }
     }
 }
+
+
+ */
+
