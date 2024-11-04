@@ -243,6 +243,8 @@ fun MainAppNavHost(context: Context) {
         }
     }
 }*/
+var userstore = ""
+
 class MainActivity : ComponentActivity() {
 
 
@@ -340,7 +342,6 @@ class MainActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
-    var userstore = ""
 
 
     val navController = rememberNavController()
@@ -373,22 +374,22 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
             }
 
         // Composable for EventPage with dynamic restaurantName argument
-        composable(
-            route = "event_page/{restaurantName}",
-            arguments = listOf(navArgument("restaurantName") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val restaurantName = backStackEntry.arguments?.getString("restaurantName") ?: "Unknown Restaurant"
-            //EventPage(navController = navController, restaurantName = restaurantName, context = context) // Pass context here
-        }
+//        composable(
+//            route = "event_page/{restaurantName}",
+//            arguments = listOf(navArgument("restaurantName") { type = NavType.StringType })
+//        ) { backStackEntry ->
+//            val restaurantName = backStackEntry.arguments?.getString("restaurantName") ?: "Unknown Restaurant"
+//            //EventPage(navController = navController, restaurantName = restaurantName, context = context) // Pass context here
+//        }
 
         composable("create_event"){
             CreateEvents(navController = navController, chaneloc, userstore)
         }
 
         // keep this same.
-        composable("event_details")
+        composable("events_detail")
         {
-            EventDetails(navController = navController, nameofevent)
+            EventDetails(navController = navController, nameofevent,userstore)
         }
 
         // Add the ReviewPage composable

@@ -103,6 +103,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-database-ktx")
     // Places API
     implementation("com.google.android.libraries.places:places:3.1.0")
     implementation("com.google.android.gms:play-services-maps:19.0.0")

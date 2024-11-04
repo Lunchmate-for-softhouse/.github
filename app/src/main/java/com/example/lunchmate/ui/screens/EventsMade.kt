@@ -203,7 +203,7 @@ fun EventItem(event: Event, navController: NavController) {
                         .weight(1f)
                         .clickable {
                             nameofevent = event.eventName
-                            navController.navigate("event_details") // Leave this empty for now
+                            navController.navigate("events_detail") // Leave this empty for now
                         }
                 )
                 // Menu button
@@ -324,7 +324,7 @@ fun EventCreatorItem(event: Event, navController: NavController) {
                     modifier = Modifier
                         .weight(1f)
                         .clickable {
-                            navController.navigate("event_details/${event.eventName}") // Leave this empty for now
+                            navController.navigate("events_detail") // Leave this empty for now
                         }
                 )
             }
