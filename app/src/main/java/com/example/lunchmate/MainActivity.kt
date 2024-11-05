@@ -1,6 +1,8 @@
 package com.example.lunchmate
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -11,7 +13,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,6 +25,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.example.lunchmate.ui.screens.HomePage
+import com.example.lunchmate.ui.screens.MainPage
 import com.example.lunchmate.ui.screens.RegisterPage
 import com.example.lunchmate.ui.screens.SignInPage
 import com.example.lunchmate.ui.theme.LunchMateTheme
@@ -98,17 +103,20 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import com.example.lunchmate.com.example.lunchmate.ui.screens.EventDetails
+//import com.example.lunchmate.com.example.lunchmate.ui.screens.ReviewPage
 import com.example.lunchmate.ui.screens.CreateEvents
-//import com.example.lunchmate.ui.screens.EventPage
 import com.example.lunchmate.ui.screens.EventsMade
-import com.example.lunchmate.ui.screens.Reviews
 import com.example.lunchmate.ui.screens.ReviewNotificationWorker
 import com.example.lunchmate.ui.screens.chaneloc
 import com.example.lunchmate.ui.screens.nameofevent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /*class MainActivity : ComponentActivity() {
@@ -237,17 +245,21 @@ fun MainAppNavHost(context: Context) {
 }*/
 class MainActivity : ComponentActivity() {
 
+
     companion object {
         private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 1001
+
     }
 
     // Declare the permission launcher
     private lateinit var notificationPermissionLauncher: ActivityResultLauncher<String>
+
     private var shouldNavigateToReview by mutableStateOf(false)
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         // Delay Firebase initialization if not immediately needed
         GlobalScope.launch(Dispatchers.IO) {
@@ -304,6 +316,7 @@ class MainActivity : ComponentActivity() {
 
     // Function to schedule a notification after the order is confirmed
     private fun scheduleReviewNotification() {
+        // Schedule the WorkManager notification with a 1-minute delay
         val notificationWorkRequest: WorkRequest = OneTimeWorkRequestBuilder<ReviewNotificationWorker>()
             .setInitialDelay(1, TimeUnit.MINUTES) // Delay of 1 minute
             .build()
@@ -328,6 +341,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
     var userstore = ""
+
+
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "home") {
@@ -351,48 +366,41 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
                 EventsMade(navController, username)
             }
         }
-
         composable("current_events") {
+            // Replace "user_id" with the actual logic to get the current user's ID
             val creatorName = userstore // Get the current user's ID
-            EventsMade(navController = navController, creatorName = creatorName)
+            EventsMade(navController = navController, creatorName = creatorName) // Pass currentUserId here
         }
 
+        // Composable for EventPage with dynamic restaurantName argument
         composable(
             route = "event_page/{restaurantName}",
             arguments = listOf(navArgument("restaurantName") { type = NavType.StringType })
         ) { backStackEntry ->
-            val restaurantName =
-                backStackEntry.arguments?.getString("restaurantName") ?: "Unknown Restaurant"
+            val restaurantName = backStackEntry.arguments?.getString("restaurantName") ?: "Unknown Restaurant"
+            //EventPage(navController = navController, restaurantName = restaurantName, context = context) // Pass context here
         }
 
-//        composable("event_page") {
-//            EventPage(navController = navController,userstore)
-//        }
-
-
-        composable("create_event") {
+        composable("create_event"){
             CreateEvents(navController = navController, chaneloc, userstore)
         }
 
-        composable("event_details") {
+        // keep this same.
+        composable("event_details")
+        {
             EventDetails(navController = navController, nameofevent)
         }
-        composable("reviews") {
-            Reviews(navController = navController)
-        }
 
-        // Add Reviews as a composable with route "reviews"
-//        composable("reviews") {
-//            Reviews(navController = navController) // Pass the navController to Reviews screen
+        // Add the ReviewPage composable
+//        composable("review_pag") {
+//            ReviewPage(onBack = { navController.popBackStack() }) // Navigate back to the previous screen
 //        }
     }
 
     // Handle navigation to the review page after the nav host is set up
-    /*if (shouldNavigateToReview) {
+    if (shouldNavigateToReview) {
         LaunchedEffect(Unit) {
-            navController.navigate("reviews")
+            navController.navigate("review")
         }
     }
-    */
 }
-
