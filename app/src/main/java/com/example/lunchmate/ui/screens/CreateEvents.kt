@@ -218,6 +218,7 @@ fun CreateEvents(navController: NavController, Location: String, userName: Strin
                         .background(Color.White)
                         .padding(8.dp)
                 )
+                eventcreator=createdBy
 
                 Spacer(modifier = Modifier.height(32.dp))
 

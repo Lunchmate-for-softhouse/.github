@@ -446,7 +446,8 @@ fun EventCreatorItem(event: Event, navController: NavController, onDeleteConfirm
                     modifier = Modifier
                         .weight(1f)
                         .clickable {
-                            navController.navigate("event_details/${event.eventName}")
+                            nameofevent = event.eventName
+                            navController.navigate("event_details")
                         }
                 )
             }
