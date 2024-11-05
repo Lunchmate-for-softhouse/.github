@@ -1,33 +1,42 @@
-package com.example.lunchmate.com.example.lunchmate.ui.screens
+package com.example.lunchmate.ui.screens
 
-import BottomNavBar
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import ChatScreen
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.ui.Modifier
-import kotlinx.coroutines.delay
-import java.text.SimpleDateFormat
-import java.util.*
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.ui.text.font.FontWeight
 
 
+@Composable
+fun EventDetails(navController: NavController, eventName: String, userId: String) {
+    var showDialog by remember { mutableStateOf(true) }
 
-fun EventDetails(navController: NavController, eventName: String){
-
-
-
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Select an Option") },
+            text = {
+                Text("What would you like to do?")
+            },
+            confirmButton = {
+                Button(onClick = {
+                    // Navigate to the chat screen
+                    navController.navigate("chat_screen")
+                    showDialog = false // Close dialog
+                }) {
+                    Text("Chat")
+                }
+            },
+            dismissButton = {
+                Button(onClick = {
+                    // Navigate to the orders screen
+                    navController.navigate("view_order")
+                    showDialog = false // Close dialog
+                }) {
+                    Text("View Orders")
+                }
+            }
+        )
+    }
 }

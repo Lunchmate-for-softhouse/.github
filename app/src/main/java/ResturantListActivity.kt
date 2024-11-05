@@ -209,6 +209,10 @@ class ResturantListActivity : AppCompatActivity() {
         }
     }
 
+    public fun showmenu(){
+
+    }
+
     private fun showFilterDialog() {
        // val types = arrayOf("All", "Restaurant", "Cafe", "Pub")
         val priceLevels = arrayOf("All", "Inexpensive", "Moderate", "Expensive", "Very Expensive")
