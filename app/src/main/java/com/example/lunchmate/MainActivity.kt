@@ -108,7 +108,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import com.example.lunchmate.com.example.lunchmate.ui.screens.EventDetails
-import com.example.lunchmate.com.example.lunchmate.ui.screens.ReviewPage
+//import com.example.lunchmate.com.example.lunchmate.ui.screens.ReviewPage
 import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.EventsMade
 import com.example.lunchmate.ui.screens.ReviewNotificationWorker
@@ -392,9 +392,9 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
         }
 
         // Add the ReviewPage composable
-        composable("review_pag") {
-            ReviewPage(onBack = { navController.popBackStack() }) // Navigate back to the previous screen
-        }
+//        composable("review_pag") {
+//            ReviewPage(onBack = { navController.popBackStack() }) // Navigate back to the previous screen
+//        }
     }
 
     // Handle navigation to the review page after the nav host is set up
