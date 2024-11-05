@@ -366,11 +366,11 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
                 EventsMade(navController, username)
             }
         }
-            composable("current_events") {
-                // Replace "user_id" with the actual logic to get the current user's ID
-                val creatorName = userstore // Get the current user's ID
-                EventsMade(navController = navController, creatorName = creatorName) // Pass currentUserId here
-            }
+        composable("current_events") {
+            // Replace "user_id" with the actual logic to get the current user's ID
+            val creatorName = userstore // Get the current user's ID
+            EventsMade(navController = navController, creatorName = creatorName) // Pass currentUserId here
+        }
 
         // Composable for EventPage with dynamic restaurantName argument
         composable(

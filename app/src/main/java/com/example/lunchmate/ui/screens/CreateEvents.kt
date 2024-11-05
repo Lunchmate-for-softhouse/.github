@@ -36,6 +36,7 @@ fun CreateEvents(navController: NavController, Location: String, userName: Strin
     val location = Location // Set location as constant
     var pickupDineIn by remember { mutableStateOf("Pick up") }
     var isPickup by remember { mutableStateOf(true) }
+    var isEventEnded by remember { mutableStateOf(false) }
 
     // Snackbar host state
     val snackbarHostState = remember { SnackbarHostState() }
@@ -199,7 +200,9 @@ fun CreateEvents(navController: NavController, Location: String, userName: Strin
                                 eventDescription = eventDescription,
                                 createdBy = createdBy,
                                 pickupDineIn = pickupDineIn,
-                                location = location
+                                location = location,
+                                isEventEnded = false,
+                                etaStart = false
                             )
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar("Event created successfully!")
