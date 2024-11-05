@@ -306,7 +306,7 @@ fun EventItem(event: Event, navController: NavController) {
             ) {
                 Button(
                     onClick = {
-                        navController.navigate("event_pagex")
+                        navController.navigate("event_page")
                         // Handle place order logic
                     },
                     colors = ButtonDefaults.buttonColors(
