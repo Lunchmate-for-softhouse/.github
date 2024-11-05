@@ -22,6 +22,8 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+var eventcreator= ""
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CreateEvents(navController: NavController, Location: String, userName: String) {
