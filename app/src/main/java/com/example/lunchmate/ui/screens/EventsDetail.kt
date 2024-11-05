@@ -31,15 +31,12 @@ fun EventDetails(navController: NavController, eventName: String, userId: String
             dismissButton = {
                 Button(onClick = {
                     // Navigate to the orders screen
-                    navController.navigate("ordersScreen")
+                    navController.navigate("view_order")
                     showDialog = false // Close dialog
                 }) {
                     Text("View Orders")
                 }
             }
         )
-    } else {
-        // Show the chat screen directly if no dialog is present
-        ChatScreen(eventName, userId)
     }
 }
