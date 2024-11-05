@@ -32,6 +32,7 @@ import com.example.lunchmate.ui.theme.LunchMateTheme
 import com.google.firebase.FirebaseApp
 //import com.example.lunchmate.ui.screens.EventPage // Import the EventPage
 import java.util.concurrent.TimeUnit
+//import com.example.lunchmate.ui.screens.eventNamer
 
 
 /*class MainActivity : ComponentActivity() {
@@ -113,6 +114,7 @@ import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.EventsMade
 import com.example.lunchmate.ui.screens.ReviewNotificationWorker
 import com.example.lunchmate.ui.screens.chaneloc
+
 import com.example.lunchmate.ui.screens.nameofevent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -356,6 +358,10 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
             RegisterPage(navController = navController) // Register screen
         }
 
+        composable("macp") {
+            MapsActivityCurrentPlaceScreen(navController = navController) //
+        }
+
         composable(
             route = "main_page/{username}",
             arguments = listOf(navArgument("username") { type = NavType.StringType })
@@ -371,7 +377,7 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
                 val creatorName = userstore // Get the current user's ID
                 EventsMade(navController = navController, creatorName = creatorName) // Pass currentUserId here
             }
-
+/*
         // Composable for EventPage with dynamic restaurantName argument
         composable(
             route = "event_page/{restaurantName}",
@@ -379,11 +385,22 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
         ) { backStackEntry ->
             val restaurantName = backStackEntry.arguments?.getString("restaurantName") ?: "Unknown Restaurant"
             //EventPage(navController = navController, restaurantName = restaurantName, context = context) // Pass context here
-        }
+        }*/
 
         composable("create_event"){
-            CreateEvents(navController = navController, chaneloc, userstore)
+            CreateEvents(navController = navController, chaneloc, userstore  )
+
         }
+
+
+
+        composable("create_event/{eventName}") { backStackEntry ->
+            val eventName = backStackEntry.arguments?.getString("eventName") ?: ""
+            CreateEvents(navController = navController, chaneloc, userstore, eventName = eventName)
+            //CreateEvents(navController = navController, eventName = eventName)
+        }
+
+
 
         // keep this same.
         composable("event_details")
@@ -391,10 +408,17 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
             EventDetails(navController = navController, nameofevent)
         }
 
+
+
         // Add the ReviewPage composable
         composable("review_pag") {
             ReviewPage(onBack = { navController.popBackStack() }) // Navigate back to the previous screen
         }
+
+//        composable("create_event/{eventName}") { backStackEntry ->
+//            val eventName = backStackEntry.arguments?.getString("eventName") ?: ""
+//            CreateEvents(navController, chaneloc, userstore, eventName) // Pass eventName to CreateEvents
+//        }
     }
 
     // Handle navigation to the review page after the nav host is set up

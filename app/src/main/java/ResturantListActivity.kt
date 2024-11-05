@@ -78,14 +78,15 @@ class ResturantListActivity : AppCompatActivity() {
 
         val MapViewButton: Button = findViewById(R.id.btnListView)
         MapViewButton.setOnClickListener {
-            openRestaurantList()
+          //  openRestaurantList()
         }
     }
+    /*
     private fun openRestaurantList() {
         val intent = Intent(this@ResturantListActivity, MapsActivityCurrentPlace::class.java)
         startActivity(intent)
     }
-
+*/
     private fun showLocationSelectionDialog() { /*
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Select Location")
