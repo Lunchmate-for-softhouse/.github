@@ -36,6 +36,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.example.lunchmate.com.example.lunchmate.ui.screens.ViewOrder
 //import com.example.lunchmate.com.example.lunchmate.ui.screens.ReviewPage
 import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.EventDetails
@@ -205,6 +206,10 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
         composable("chat_screen")
         {
             ChatScreen(nameofevent, userstore)
+        }
+        composable("view_order")
+        {
+            ViewOrder()
         }
 
         // Add the ReviewPage composable
