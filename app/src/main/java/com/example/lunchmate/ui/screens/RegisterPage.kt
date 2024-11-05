@@ -29,7 +29,7 @@ fun RegisterPage(navController: NavController) {
     var showSuccessDialog by remember { mutableStateOf(false) } // Controls success dialog visibility
 
     val db = FirebaseFirestore.getInstance() // Initialize Firestore
-    val locations = listOf("Malmo", "Karlskrona", "Stockholm", "Vaxjo", "Karlshamn", "Jonkoping")
+    val locations = listOf("Malmö", "Karlskrona", "Stockholm", "Växjö", "Karlshamn", "Jönköping")
 
     Column(
         modifier = Modifier
