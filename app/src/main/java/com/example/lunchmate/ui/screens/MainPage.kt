@@ -168,12 +168,29 @@ fun MainPage(navController: NavController, username: String) {
             ) {
                 Text(text = "Open Swish")
             }
+            Button(
+                onClick = {
+                    Log.d("SwishPaymentButton", "Pay with Swish button clicked")
+
+                    // Call makeSwishPaymentRequest with a sample username for testing
+                    val username = "sampleUsername" // Replace with actual username for dynamic use
+                    makeSwishPaymentRequest(context, username)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF00C300) // Swish green color
+                ),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(text = "Pay with Swish", color = Color.White)
+            }
 
         }
+
 
         // Fixed BottomAppBar
         BottomNavBar(navController = navController)
     }
+
 }
 
 // Function to fetch events for a selected location from Firestore
