@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lunchmate.model.Restaurant
+import com.example.lunchmate.ui.screens.chaneloc
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
@@ -28,17 +29,24 @@ class ResturantListActivity : AppCompatActivity() {
     private lateinit var restaurantAdapter: RestaurantAdapter
     private val restaurantList = mutableListOf<Restaurant>()
 
-    // Predefined locations and coordinates
+    /*// Predefined locations and coordinates
     private val locationOptions = arrayOf(
         "Softhouse Malmo",
         "Softhouse Karlskrona",
         "Softhouse Vaxjo"
     )
-
+*/
     private val locationCoordinates = mapOf(
-        "Softhouse Malmo" to LatLng(55.611331059590206, 13.002231964445214),
-        "Softhouse Karlskrona" to LatLng(56.18320240744998, 15.593305575774751),
-        "Softhouse Vaxjo" to LatLng(56.87750939887021, 14.808042591619134)
+        "Malmö" to LatLng(55.611331059590206, 13.002231964445214),
+        "Karlskrona" to LatLng(56.18320240744998, 15.593305575774751),
+        "Växjö" to LatLng(56.87750939887021, 14.808042591619134),
+        "Stockholm" to LatLng(59.33887571833381, 18.057613734616805),
+        "Karlshamn" to LatLng(56.16464684268269, 14.866310010348741),
+        "Kalmar" to LatLng(56.66415607872528, 16.37026323525738),
+        "Jönköping" to LatLng(57.78355698256043, 14.164313337394715),
+        "Luleå" to LatLng(65.58116493400121, 22.148896566956076),
+        "Uppsala" to LatLng(59.85965384178488, 17.636767367327494),
+        "Sarajevo" to LatLng(43.84662503289982, 18.35077154879623),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,7 +86,7 @@ class ResturantListActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun showLocationSelectionDialog() {
+    private fun showLocationSelectionDialog() { /*
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Select Location")
 
@@ -90,18 +98,20 @@ class ResturantListActivity : AppCompatActivity() {
         builder.setView(spinner)
 
         builder.setPositiveButton("OK") { dialog, _ ->
-            val selectedLocation = spinner.selectedItem.toString()
+            val selectedLocation = spinner.selectedItem.toString() */
+
+            val selectedLocation = chaneloc
             val latLng = locationCoordinates[selectedLocation]
 
             if (latLng != null) {
                 // Now call the API to fetch restaurants based on the selected location
                 searchNearbyRestaurants(latLng)
-            }
-            dialog.dismiss()
+           // }
+            //dialog.dismiss()
         }
 
-        builder.setCancelable(false)
-        builder.show()
+        //builder.setCancelable(false)
+        //builder.show()
     }
 
     private fun searchNearbyRestaurants(location: LatLng) {
@@ -167,7 +177,7 @@ class ResturantListActivity : AppCompatActivity() {
                     val openingHours = placeDetails.optJSONObject("opening_hours")?.optJSONArray("weekday_text")?.let {
                         List(it.length()) { index -> it.getString(index) }
                     }
-                    val priceLevel = placeDetails.optInt("price_level", -1)
+                    val priceLevel = placeDetails.optString("price_level",)
                     val photoReference = placeDetails.optJSONArray("photos")?.getJSONObject(0)?.getString("photo_reference")
                     val types = placeDetails.optJSONArray("types")?.let {
                         List(it.length()) { index -> it.getString(index) }
@@ -198,16 +208,66 @@ class ResturantListActivity : AppCompatActivity() {
         }
     }
 
+    public fun showmenu(){
+
+    }
 
     private fun showFilterDialog() {
-        val cuisines = arrayOf("Italian", "Chinese", "Indian", "Mexican")
+       // val types = arrayOf("All", "Restaurant", "Cafe", "Pub")
+        val priceLevels = arrayOf("All", "Inexpensive", "Moderate", "Expensive", "Very Expensive")
+
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Select Cuisine")
-        builder.setItems(cuisines) { _, which ->
-            val selectedCuisine = cuisines[which]
-            // Apply filter based on selectedCuisine (you can implement filtering logic here)
+        builder.setTitle("Filter Restaurants")
+
+        val inflater = layoutInflater
+        val dialogView = inflater.inflate(R.layout.dialog_filter, null)
+        builder.setView(dialogView)
+
+        //val cuisineSpinner: Spinner = dialogView.findViewById(R.id.cuisineSpinner)
+        val priceSpinner: Spinner = dialogView.findViewById(R.id.priceSpinner)
+
+        // Set up the spinners
+        //val cuisineAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, types)
+        //cuisineSpinner.adapter = cuisineAdapter
+
+        val priceAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, priceLevels)
+        priceSpinner.adapter = priceAdapter
+
+        builder.setPositiveButton("Apply") { dialog, _ ->
+            //val selectedCuisine = cuisineSpinner.selectedItem.toString()
+            val selectedPriceLevel = priceSpinner.selectedItem.toString()
+
+            filterRestaurants( selectedPriceLevel)
+            dialog.dismiss()
         }
+
+        builder.setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
         builder.show()
+    }
+    private fun filterRestaurants(selectedPriceLevel: String) {
+        val filteredList = restaurantList.filter { restaurant ->
+            // Map restaurant price levels to the filter choices
+            val priceMatches = when (selectedPriceLevel) {
+                "All" -> true
+                "Inexpensive" -> restaurant.priceLevel == "1"
+                "Moderate" -> restaurant.priceLevel == "2"
+                "Expensive" -> restaurant.priceLevel == "3"
+                "Very Expensive" -> restaurant.priceLevel == "4"
+                else -> true
+            }
+
+            // Check if the cuisine type matches
+            //val cuisineMatches = selectedCuisine == "All" || restaurant.types.contains(selectedCuisine)
+
+
+             priceMatches
+        }
+
+        // Update the adapter data without creating a new instance
+        restaurantAdapter = RestaurantAdapter(filteredList) { restaurant ->
+            // Handle restaurant click
+        }
+        restaurantRecyclerView.adapter = restaurantAdapter
     }
 
     companion object {

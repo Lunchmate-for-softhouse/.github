@@ -1,6 +1,6 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.gms.google-services")
 }
@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.lunchmate"
-        minSdk = 23
+        minSdk = 21
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -82,6 +82,8 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.play.services.location)
     implementation(libs.androidx.espresso.core)
+    implementation(libs.firebase.storage.ktx)
+    //implementation(libs.places)
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose")
     implementation(libs.androidx.core.ktx)
@@ -101,21 +103,27 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.31.3-beta") // Or the latest version
     implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-firestore-ktx")
-    implementation("com.google.firebase:firebase-auth:22.1.1")
-    //implementation(libs.firebase.auth)
+    implementation("com.google.firebase:firebase-firestore-ktx:23.0.3")
+    implementation("com.google.firebase:firebase-database-ktx")
+
     // Places API
+    implementation("com.google.android.libraries.places:places:3.1.0")
     implementation("com.google.android.gms:play-services-maps:19.0.0")
     implementation("com.google.maps.android:android-maps-utils:2.3.0")
     implementation ("com.google.android.libraries.places:places:3.1.0")
     implementation ("com.squareup.okhttp3:okhttp:4.9.3")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0")
+    implementation ("androidx.compose.material3:material3:<latest-version>")
+    implementation ("androidx.work:work-runtime-ktx:2.7.1")
+    implementation("io.coil-kt:coil-compose:2.2.2") // use the latest version
 
-    // Google Sign-In
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
 
-    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+
+
+    // WorkManager for background tasks
+
+
 
 }
 

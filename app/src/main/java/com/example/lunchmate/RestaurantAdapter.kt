@@ -7,8 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lunchmate.model.Restaurant
+import androidx.navigation.NavController
+import com.example.lunchmate.ui.screens.CreateEvents
+import com.example.lunchmate.ui.screens.chaneloc
+
 
 class RestaurantAdapter(
     private val restaurants: List<Restaurant>,
@@ -24,12 +29,36 @@ class RestaurantAdapter(
         private val priceLevelTextView: TextView = itemView.findViewById(R.id.priceLevelTextView)
         private val menuButton: Button = itemView.findViewById(R.id.menuButton)
 
+        fun showmenu(restaurant: Restaurant){
+            menuButton.text = "View Menu"
+            menuButton.setOnClickListener {
+                if (!restaurant.website.isNullOrBlank()) {
+                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(restaurant.website))
+                    it.context.startActivity(browserIntent)
+                } else {
+                    Toast.makeText(it.context, "No menu available", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+        }
+        fun handleNameClick(name: String) {
+
+        }
+
         fun bind(restaurant: Restaurant) {
             nameTextView.text = restaurant.name
             addressTextView.text = restaurant.address
             ratingTextView.text = "Rating: ${restaurant.rating ?: "N/A"}"
             userRatingsTotalTextView.text = "User Ratings: ${restaurant.userRatingsTotal ?: "N/A"}"
             priceLevelTextView.text = "Price Level: ${restaurant.priceLevel ?: "N/A"}"
+
+            // Set the OnClickListener to call the handleNameClick function
+            nameTextView.setOnClickListener {
+                handleNameClick(restaurant.name)
+            }
+
+
+
 
             // Set button text and click listener
             menuButton.text = "View Menu"
@@ -41,7 +70,7 @@ class RestaurantAdapter(
                     // Logic for showing a placeholder or message when no website is available
                     // For example, you could show a Toast or open a dialog
                     // Here, we are just using a placeholder Toast
-                    // Toast.makeText(it.context, "No menu available", Toast.LENGTH_SHORT).show()
+                     Toast.makeText(it.context, "No menu available", Toast.LENGTH_SHORT).show()
                 }
             }
         }

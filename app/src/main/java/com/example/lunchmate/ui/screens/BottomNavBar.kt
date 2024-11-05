@@ -27,11 +27,14 @@ import com.example.lunchmate.MapsActivityCurrentPlace
 
 
 @Composable
-fun BottomNavBar(navController: NavController) {
+fun BottomNavBar(
+    navController: NavController,
+    modifier: Modifier = Modifier // Added Modifier parameter with default value
+) {
     val context = LocalContext.current
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(Color(0xFFB4572F))
             .padding(8.dp)
@@ -56,6 +59,7 @@ fun BottomNavBar(navController: NavController) {
                 )
             }
         }
+
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -100,6 +104,7 @@ fun BottomNavBar(navController: NavController) {
                 )
             }
         }
+
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -122,3 +127,4 @@ fun BottomNavBar(navController: NavController) {
         }
     }
 }
+
