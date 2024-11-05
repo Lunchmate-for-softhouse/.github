@@ -1,8 +1,7 @@
 package com.example.lunchmate
 
-import android.app.Activity
+import ChatScreen
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -13,9 +12,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,7 +22,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.example.lunchmate.ui.screens.HomePage
-import com.example.lunchmate.ui.screens.MainPage
 import com.example.lunchmate.ui.screens.RegisterPage
 import com.example.lunchmate.ui.screens.SignInPage
 import com.example.lunchmate.ui.theme.LunchMateTheme
@@ -39,20 +35,18 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavController
-import com.example.lunchmate.com.example.lunchmate.ui.screens.EventDetails
 //import com.example.lunchmate.com.example.lunchmate.ui.screens.ReviewPage
 import com.example.lunchmate.ui.screens.CreateEvents
+import com.example.lunchmate.ui.screens.EventDetails
+import com.example.lunchmate.ui.screens.EventPage
 import com.example.lunchmate.ui.screens.EventsMade
 import com.example.lunchmate.ui.screens.ReviewNotificationWorker
 import com.example.lunchmate.ui.screens.chaneloc
+import com.example.lunchmate.ui.screens.eventcreator
 import com.example.lunchmate.ui.screens.nameofevent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -185,14 +179,19 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
             EventsMade(navController = navController, creatorName = creatorName) // Pass currentUserId here
         }
 
-        // Composable for EventPage with dynamic restaurantName argument
-        composable(
-            route = "event_page/{restaurantName}",
-            arguments = listOf(navArgument("restaurantName") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val restaurantName = backStackEntry.arguments?.getString("restaurantName") ?: "Unknown Restaurant"
-            //EventPage(navController = navController, restaurantName = restaurantName, context = context) // Pass context here
+//        // Composable for EventPage with dynamic restaurantName argument
+//        composable(
+//            route = "event_page",
+//            arguments = listOf(navArgument("restaurantName") { type = NavType.StringType })
+//        ) { backStackEntry ->
+//            val restaurantName = backStackEntry.arguments?.getString("restaurantName") ?: "Unknown Restaurant"
+//            EventPage(navController = navController, restaurantName = restaurantName, eventcreator) // Pass context here
+//        }
+
+        composable("event_page"){
+            EventPage(navController = navController, nameofevent,eventcreator )
         }
+
 
         composable("create_event"){
             CreateEvents(navController = navController, chaneloc, userstore)
@@ -202,6 +201,10 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
         composable("event_details")
         {
             EventDetails(navController = navController, nameofevent, userstore)
+        }
+        composable("chat_screen")
+        {
+            ChatScreen(nameofevent, userstore)
         }
 
         // Add the ReviewPage composable

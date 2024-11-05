@@ -26,7 +26,7 @@ import com.example.lunchmate.com.example.lunchmate.model.Order
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventPage(navController: NavController,creatorName: String,restaurantName: String) {
+fun EventPage(navController: NavController, restaurantName: String, creatorName:String) {
     val context = LocalContext.current // Get the current context
     var inputMeal by remember { mutableStateOf("") }       // For meal name
     var inputDrink by remember { mutableStateOf("") }      // For drink name
