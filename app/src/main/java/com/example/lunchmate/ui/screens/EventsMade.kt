@@ -17,6 +17,7 @@ import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -84,6 +85,31 @@ fun EventsMade(navController: NavController, creatorName: String) {
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 20.sp),
                 color = Color.Black
             )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End // Aligns the button to the right
+            ){
+                Button(
+                    onClick = {
+                        navController.navigate("sign_in")
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF4CAF50),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ExitToApp,
+                        contentDescription = "Logout Icon",
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Sign Out")
+                }
+            }
+
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
