@@ -209,6 +209,7 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
 
 
 
+
         composable("create_event/{eventName}") { backStackEntry ->
             val eventName = backStackEntry.arguments?.getString("eventName") ?: ""
             CreateEvents(navController = navController, chaneloc, userstore, eventName = eventName)
