@@ -1,74 +1,83 @@
 package com.example.lunchmate.ui.screens
-/*
-import com.example.lunchmate.ui.screens.EventPage
+
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocalBar
+import androidx.compose.material.icons.filled.Money
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.LineHeightStyle
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-import androidx.navigation.NavController
+import com.example.lunchmate.com.example.lunchmate.model.Order
+import com.example.lunchmate.R
 
-
-
+// ViewOrder screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ViewOrder(navController: NavController, nameOfEvent: String, orderLoc: String, orderOwner: String) {
-    var orders by remember { mutableStateOf<List<Order>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
+fun ViewOrder(eventName: String, location: String) {
+    var orders by remember { mutableStateOf(listOf<Order>()) }
     val db = FirebaseFirestore.getInstance()
 
-    // Fetch orders from Firestore when the screen is first loaded
+    // Log the parameters to check if they have values
+    Log.d("Firestore", "Fetching orders for Event: $eventName, Location: $location")
+
+    // Fetch orders from Firestore based on event name and location
     LaunchedEffect(Unit) {
-        fetchOrders(db, nameOfEvent, orderLoc) { fetchedOrders ->
-            orders = fetchedOrders
-            isLoading = false
-        }
+        db.collection("Orders")
+            .whereEqualTo("eventName", eventName)
+            .whereEqualTo("location", location)
+            .get()
+            .addOnSuccessListener { result ->
+                val fetchedOrders = result.mapNotNull { document ->
+                    document.toObject(Order::class.java) // Mapping Firestore document to Order object
+                }
+                orders = fetchedOrders
+
+                // Log the fetched orders and the number of orders fetched
+                Log.d("Firestore", "Fetched orders: $fetchedOrders")
+                Log.d("Firestore", "Fetched orders count: ${fetchedOrders.size}")
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error fetching orders", e)
+            }
     }
 
-    // Main UI layout for the Orders Screen
+    // Main UI layout
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Your Orders") },
-            )
+            CenterAlignedTopAppBar(title = { Text("Orders for the $eventName - $location") })
         },
         content = { padding ->
-            // Content of the screen
-            Surface(
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize(),
-                color = MaterialTheme.colorScheme.background
-            ) {
-                if (isLoading) {
-                    // Show a loading spinner while fetching data
-                    CircularProgressIndicator(modifier = Modifier.align(LineHeightStyle.Alignment.Center))
-                } else {
-                    if (orders.isNotEmpty()) {
-                        // Display orders in a list
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize().padding(16.dp)
-                        ) {
-                            items(orders) { order ->
-                                OrderCard(order)
-                            }
-                        }
-                    } else {
-                        // Display a message if no orders are found
-                        Text(
-                            text = "No orders found for this restaurant and location.",
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(16.dp)
-                        )
+            if (orders.isEmpty()) {
+                // Display a message if no orders were fetched
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = "No orders available for this event.", fontSize = 18.sp, color = Color.Gray)
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                ) {
+                    items(orders) { order ->
+                        OrderItem(order = order)
                     }
                 }
             }
@@ -76,65 +85,78 @@ fun ViewOrder(navController: NavController, nameOfEvent: String, orderLoc: Strin
     )
 }
 
-// Function to fetch orders from Firestore
-fun fetchOrders(db: FirebaseFirestore, eventName: String, location: String, callback: (List<Order>) -> Unit) {
-    db.collection("Orders")
-        .whereEqualTo("eventName", eventName)
-        .whereEqualTo("location", location)
-        .get()
-        .addOnSuccessListener { result ->
-            val ordersList = result.documents.mapNotNull { document ->
-                val mealName = document.getString("mealName") ?: ""
-                val mealPrice = document.getDouble("mealPrice") ?: 0.0
-                val drinkName = document.getString("drinkName") ?: ""
-                val drinkPrice = document.getDouble("drinkPrice") ?: 0.0
-                val eventName = document.getString("eventName") ?: ""
-                val location = document.getString("location") ?: ""
-                val creator = document.getString("creator") ?: ""
-
-                Order(mealName, mealPrice, drinkName, drinkPrice, eventName, location, creator)
-            }
-            callback(ordersList)
-        }
-        .addOnFailureListener { exception ->
-            Log.w("Firestore", "Error getting documents: ", exception)
-            callback(emptyList())  // Return empty list on failure
-        }
-}
-
-// Composable to display individual order in a card
 @Composable
-fun OrderCard(order: Order) {
+fun OrderItem(order: Order) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .shadow(4.dp, shape = MaterialTheme.shapes.medium),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            .padding(16.dp),
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.elevatedCardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFAFAFA))
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(16.dp)
         ) {
-            Column {
-                Text("Meal: ${order.mealName}", style = MaterialTheme.typography.bodyMedium)
-                if (order.mealPrice > 0) {
-                    Text("Price: ${order.mealPrice} SEK", style = MaterialTheme.typography.bodySmall)
-                }
-                if (order.drinkName.isNotEmpty()) {
-                    Text("Drink: ${order.drinkName}", style = MaterialTheme.typography.bodyMedium)
-                    Text("Price: ${order.drinkPrice} SEK", style = MaterialTheme.typography.bodySmall)
-                }
+            // Creator Name with Icon
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Filled.Person, // Material Icon for person
+                    contentDescription = "Creator Icon",
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "Creator: ${order.creator}", style = MaterialTheme.typography.titleMedium)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Drink Icon and Name
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Filled.LocalBar, // Material Icon for drink
+                    contentDescription = "Drink Icon",
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "Drink: ${order.drinkName}", style = MaterialTheme.typography.bodyLarge)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Meal Icon and Name
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Filled.Restaurant, // Material Icon for meal
+                    contentDescription = "Meal Icon",
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "Meal: ${order.mealName}", style = MaterialTheme.typography.bodyLarge)
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Total Price with Icon
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Filled.Money, // Material Icon for price
+                    contentDescription = "Price Icon",
+                    modifier = Modifier.size(24.dp),
+                    tint = Color(0xFFFF9800)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Total Price: ${order.totalPrice} SEK",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.Black
+                )
             }
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewViewOrder() {
-    ViewOrder(navController = NavController(LocalContext.current), nameOfEvent = "Test Event", orderLoc = "Test Location", orderOwner = "Owner")
-}
-*/
