@@ -333,6 +333,7 @@ fun EventItem(event: Event, navController: NavController) {
             ) {
                 Button(
                     onClick = {
+                        nameofevent = event.eventName
                         navController.navigate("event_page")
                         // Handle place order logic
                     },
