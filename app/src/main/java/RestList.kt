@@ -357,7 +357,6 @@ fun RestaurantItem(navController: NavController, restaurant: Restaurant, origin:
         originLocation.distanceTo(restaurantLocation) / 1000 // Convert to kilometers
     }
 
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -374,6 +373,16 @@ fun RestaurantItem(navController: NavController, restaurant: Restaurant, origin:
             if (distance != null) {
                 Text(text = "Distance: ${"%.2f".format(distance)} km", fontSize = 14.sp, color = Color.LightGray)
             }
+            Text(
+                text = "Price Level: ${getPriceLevelString(restaurant.priceLevel)}",
+                fontSize = 14.sp,
+                color = Color(0xFFFFA500) // Orange color
+            )
+            Text(
+                text = "Rating: ${restaurant.rating?.toString() ?: "N/A"}",
+                fontSize = 14.sp,
+                color = Color.Red // Red color
+            )
         }
 
         // Buttons part (1/4 of the width)
@@ -382,7 +391,6 @@ fun RestaurantItem(navController: NavController, restaurant: Restaurant, origin:
                 .weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-
             Button(
                 onClick = {
                     restaurant.websiteUrl?.let { url ->
@@ -402,59 +410,24 @@ fun RestaurantItem(navController: NavController, restaurant: Restaurant, origin:
             ) {
                 Text("Order")
             }
-
         }
     }
-
-
-    /*
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(1.dp, Color.Gray)
-            .padding(16.dp)
-    ) {
-        Text(text = restaurant.name, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
-        Text(text = restaurant.address, fontSize = 14.sp, color = Color.LightGray)
-        if (distance != null) {
-            Text(text = "Distance: ${"%.2f".format(distance)} km", fontSize = 14.sp, color = Color.LightGray)
-        }
-
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(
-                onClick = {
-                    navController.navigate("create_event/${restaurant.name}")
-                }
-            ) {
-                Text("Order")
-            }
-            Button(
-                onClick = {
-                    restaurant.websiteUrl?.let { url ->
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                        navController.context.startActivity(intent)
-                    }
-                },
-                enabled = restaurant.websiteUrl != null
-            ) {
-                Text("Menu")
-            }
-        }
-    }
-    */
-
-
 }
 
-// Data class for restaurant details
+
+
+
+
 data class Restaurant(
     val name: String,
     val address: String,
     val location: LatLng,
     val placeId: String,    // To store the Place ID
-    var websiteUrl: String? = null // To store the website URL
+    var websiteUrl: String? = null, // To store the website URL
+    var priceLevel: Int? = null, // To store the price level
+    var rating: Double? = null // To store the rating
 )
+
 
 // Function to fetch nearby restaurants with place ID
 private fun searchNearbyRestaurants(location: LatLng, onResult: (List<Restaurant>) -> Unit) {
@@ -484,8 +457,10 @@ private fun searchNearbyRestaurants(location: LatLng, onResult: (List<Restaurant
                     val lat = place.getJSONObject("geometry").getJSONObject("location").getDouble("lat")
                     val lng = place.getJSONObject("geometry").getJSONObject("location").getDouble("lng")
                     val placeId = place.getString("place_id")
+                    val priceLevel = place.optInt("price_level", -1).takeIf { it != -1 }
+                    val rating = place.optDouble("rating", -1.0).takeIf { it != -1.0 }
 
-                    val restaurant = Restaurant(name, address, LatLng(lat, lng), placeId)
+                    val restaurant = Restaurant(name, address, LatLng(lat, lng), placeId, priceLevel = priceLevel, rating = rating)
                     getWebsiteUrl(restaurant) // Fetch the website URL based on placeId
                     restaurants.add(restaurant)
                 }
@@ -525,3 +500,48 @@ private fun getWebsiteUrl(restaurant: Restaurant) {
         }
     }
 }
+
+fun getPriceLevelString(priceLevel: Int?): String {
+    return priceLevel?.let {
+        "$".repeat(it)
+    } ?: "N/A"
+}
+
+
+
+/*
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, Color.Gray)
+            .padding(16.dp)
+    ) {
+        Text(text = restaurant.name, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        Text(text = restaurant.address, fontSize = 14.sp, color = Color.LightGray)
+        if (distance != null) {
+            Text(text = "Distance: ${"%.2f".format(distance)} km", fontSize = 14.sp, color = Color.LightGray)
+        }
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(
+                onClick = {
+                    navController.navigate("create_event/${restaurant.name}")
+                }
+            ) {
+                Text("Order")
+            }
+            Button(
+                onClick = {
+                    restaurant.websiteUrl?.let { url ->
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        navController.context.startActivity(intent)
+                    }
+                },
+                enabled = restaurant.websiteUrl != null
+            ) {
+                Text("Menu")
+            }
+        }
+    }
+    */
