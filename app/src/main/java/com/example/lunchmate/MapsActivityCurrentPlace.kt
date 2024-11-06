@@ -1,6 +1,7 @@
 package com.example.lunchmate
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -35,7 +36,7 @@ import okhttp3.Request
 import org.json.JSONObject
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-//import com.example.lunchmate.ui.screens.eventNamer
+
 import androidx.navigation.NavHostController
 
 //var userselectedresturant= ""
@@ -79,10 +80,12 @@ fun MapsScreen(navController: NavController) {
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = { openRestaurantList() }) {
-            Text("Open Restaurant List")
+        Button(
+            onClick = {  val intent = Intent(context, ResturantListActivity::class.java)
+                context.startActivity(intent) },
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text("View Restaurant List")
         }
 
         // Show dialog if selectedRestaurantName is not null
@@ -104,9 +107,6 @@ fun MapsScreen(navController: NavController) {
                             Text("Create")
                         }
                     }
-
-
-
                 },
                 confirmButton = {},
                 dismissButton = {}

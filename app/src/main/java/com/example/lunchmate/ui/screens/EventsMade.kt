@@ -369,6 +369,7 @@ fun EventItem(event: Event, navController: NavController) {
 
                 IconButton(
                     onClick = {
+                        nameofevent = event.eventName
                         navController.navigate("view_order")
                     },
                 ) {
@@ -658,6 +659,7 @@ fun EventCreatorItem(event: Event, navController: NavController, onDeleteConfirm
 
                 IconButton(
                     onClick = {
+                        nameofevent = event.eventName
                         navController.navigate("view_order")
                     },
                     ) {
