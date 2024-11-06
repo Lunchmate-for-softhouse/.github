@@ -248,6 +248,7 @@ fun EventPage(navController: NavController, restaurantName: String, creatorName:
         }
 
         // Confirmation Dialog
+        /*
         if (showDialog) {
             OrderConfirmationDialog(
                 totalPrice = totalPrice,
@@ -258,6 +259,8 @@ fun EventPage(navController: NavController, restaurantName: String, creatorName:
                 }
             )
         }
+        */
+
 
         // Error Dialog for no selected orders
         if (showErrorDialog) {
