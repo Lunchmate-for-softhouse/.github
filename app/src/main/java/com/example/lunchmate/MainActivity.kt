@@ -42,8 +42,10 @@ import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.EventDetails
 import com.example.lunchmate.ui.screens.EventPage
 import com.example.lunchmate.ui.screens.EventsMade
+
 import com.example.lunchmate.ui.screens.ReviewNotificationWorker
 import com.example.lunchmate.ui.screens.ViewOrder
+
 import com.example.lunchmate.ui.screens.chaneloc
 import com.example.lunchmate.ui.screens.eventcreator
 import com.example.lunchmate.ui.screens.nameofevent
@@ -125,7 +127,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
+/*
     // Function to schedule a notification after the order is confirmed
     private fun scheduleReviewNotification() {
         // Schedule the WorkManager notification with a 1-minute delay
@@ -147,7 +149,7 @@ class MainActivity : ComponentActivity() {
         Toast.makeText(this, "Selected orders cleared.", Toast.LENGTH_SHORT).show()
     }
 }
-
+*/
 // Composable navigation host for the app
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -170,6 +172,10 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
 
         composable("macp") {
             MapsActivityCurrentPlaceScreen(navController = navController) //
+        }
+
+        composable("restaurant_list") {
+            RestList(navController = navController) //
         }
 
         composable(
@@ -244,4 +250,4 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
             navController.navigate("review")
         }
     }
-}
+}}
