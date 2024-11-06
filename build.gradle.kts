@@ -7,6 +7,10 @@ plugins {
 }
 buildscript {
     dependencies {
-        classpath("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1")
+        dependencies {
+            // Other dependencies
+            classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0") // Ensure this matches Kotlin 1.9.0
+        }
+
     }
 }

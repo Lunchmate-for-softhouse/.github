@@ -23,7 +23,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.lunchmate.MapsActivityCurrentPlace
+//import com.example.lunchmate.MapsActivityCurrentPlace
 
 
 @Composable
@@ -63,10 +63,7 @@ fun BottomNavBar(
         Box(
             modifier = Modifier
                 .weight(1f)
-                .clickable {
-                    val intent = Intent(context, MapsActivityCurrentPlace::class.java)
-                    context.startActivity(intent)
-                }
+                .clickable { navController.navigate("macp") }
                 .padding(8.dp),
             contentAlignment = Alignment.Center
         ) {
