@@ -164,6 +164,10 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
             RegisterPage(navController = navController) // Register screen
         }
 
+        composable("macp") {
+            MapsActivityCurrentPlaceScreen(navController = navController) //
+        }
+
         composable(
             route = "main_page/{username}",
             arguments = listOf(navArgument("username") { type = NavType.StringType })
@@ -197,6 +201,16 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
         composable("create_event"){
             CreateEvents(navController = navController, chaneloc, userstore)
         }
+
+
+
+        composable("create_event/{eventName}") { backStackEntry ->
+            val eventName = backStackEntry.arguments?.getString("eventName") ?: ""
+            CreateEvents(navController = navController, chaneloc, userstore, eventName = eventName)
+            //CreateEvents(navController = navController, eventName = eventName)
+        }
+
+
 
         // keep this same.
         composable("event_details")
