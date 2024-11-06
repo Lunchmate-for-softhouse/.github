@@ -1,3 +1,4 @@
+/*
 package com.example.lunchmate.ui.screens
 
 import android.app.NotificationChannel
@@ -104,3 +105,4 @@ class ReviewNotificationWorker(appContext: Context, workerParams: WorkerParamete
         notificationManager.notify(1, notification)
     }
 }
+*/

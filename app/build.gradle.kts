@@ -83,6 +83,7 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.androidx.espresso.core)
     implementation(libs.firebase.storage.ktx)
+    implementation(libs.androidx.compilercommon)
     //implementation(libs.places)
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose")
