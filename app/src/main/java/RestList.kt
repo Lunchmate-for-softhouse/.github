@@ -357,6 +357,58 @@ fun RestaurantItem(navController: NavController, restaurant: Restaurant, origin:
         originLocation.distanceTo(restaurantLocation) / 1000 // Convert to kilometers
     }
 
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, Color.Gray)
+            .padding(16.dp)
+    ) {
+        // Restaurant data part (3/4 of the width)
+        Column(
+            modifier = Modifier
+                .weight(3f)
+        ) {
+            Text(text = restaurant.name, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(text = restaurant.address, fontSize = 14.sp, color = Color.LightGray)
+            if (distance != null) {
+                Text(text = "Distance: ${"%.2f".format(distance)} km", fontSize = 14.sp, color = Color.LightGray)
+            }
+        }
+
+        // Buttons part (1/4 of the width)
+        Column(
+            modifier = Modifier
+                .weight(1f),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            Button(
+                onClick = {
+                    restaurant.websiteUrl?.let { url ->
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        navController.context.startActivity(intent)
+                    }
+                },
+                enabled = restaurant.websiteUrl != null
+            ) {
+                Text("Menu")
+            }
+
+            Button(
+                onClick = {
+                    navController.navigate("create_event/${restaurant.name}")
+                }
+            ) {
+                Text("Order")
+            }
+
+        }
+    }
+
+
+    /*
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -390,6 +442,9 @@ fun RestaurantItem(navController: NavController, restaurant: Restaurant, origin:
             }
         }
     }
+    */
+
+
 }
 
 // Data class for restaurant details
