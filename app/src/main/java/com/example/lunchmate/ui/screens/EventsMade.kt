@@ -30,7 +30,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.ui.text.font.FontWeight
 
 var nameofevent= ""
-var Orignalcreator= ""
 val etaOptions = (1..15).map { i -> String.format("%02d:%02d", i / 6, (i % 6) * 10) } // Generate times from 00:10 to 02:30
 @Composable
 fun EventsMade(navController: NavController, creatorName: String) {
@@ -162,7 +161,6 @@ fun EventsMade(navController: NavController, creatorName: String) {
                         items(eventsList.filter { it.location == selectedLocation }) { event ->
                             if (event.createdBy == creatorName) {
                                 EventCreatorItem(event, navController)
-                                Orignalcreator=event.createdBy
                             } else {
                                 EventItem(event, navController)
                             }
@@ -335,7 +333,6 @@ fun EventItem(event: Event, navController: NavController) {
             ) {
                 Button(
                     onClick = {
-                        Orignalcreator=event.createdBy
                         nameofevent = event.eventName
                         navController.navigate("event_page")
                         // Handle place order logic

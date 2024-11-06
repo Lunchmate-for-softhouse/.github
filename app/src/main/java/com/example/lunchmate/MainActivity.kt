@@ -229,7 +229,7 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean, activity: 
 //        }
 
         composable("event_page"){
-            EventPage(navController = navController, nameofevent, userstore )
+            EventPage(navController = navController, nameofevent, chaneloc, userstore )
         }
 
 
