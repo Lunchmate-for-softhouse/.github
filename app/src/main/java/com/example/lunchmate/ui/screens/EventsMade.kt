@@ -356,6 +356,7 @@ fun EventItem(event: Event, navController: NavController) {
             ) {
                 IconButton(
                     onClick = {
+                        nameofevent = event.eventName
                         navController.navigate("chat_screen")
                     },
                 ) {
@@ -643,6 +644,7 @@ fun EventCreatorItem(event: Event, navController: NavController, onDeleteConfirm
             ) {
                 IconButton(
                     onClick = {
+                        nameofevent = event.eventName
                         navController.navigate("chat_screen")
                     },
 
