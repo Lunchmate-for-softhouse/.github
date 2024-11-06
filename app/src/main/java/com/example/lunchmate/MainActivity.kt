@@ -42,13 +42,24 @@ import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.EventDetails
 import com.example.lunchmate.ui.screens.EventPage
 import com.example.lunchmate.ui.screens.EventsMade
+
 import com.example.lunchmate.ui.screens.ReviewNotificationWorker
 import com.example.lunchmate.ui.screens.chaneloc
+
+
+
+import com.example.lunchmate.ui.screens.ViewOrder
+
 import com.example.lunchmate.ui.screens.eventcreator
 import com.example.lunchmate.ui.screens.nameofevent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+
+
+var chaneloc =""
+var event= ""
+
 
 
 class MainActivity : ComponentActivity() {
