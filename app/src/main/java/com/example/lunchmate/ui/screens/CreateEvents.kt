@@ -18,21 +18,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.lunchmate.saveEvent
+//import com.example.lunchmate.userselectedresturant
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 var eventcreator= ""
 
+//var eventNamer :String = ""
+
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CreateEvents(navController: NavController, Location: String, userName: String) {
+fun CreateEvents(navController: NavController, Location: String, userName: String,eventName: String? = null ) {
     val fontSize = 16.sp
     val textColour = Color.Black
     val context = LocalContext.current
 
     // Mutable state for event details
-    var eventName by remember { mutableStateOf("") }
+    //var eventName = eventNamer
+    var eventName by remember { mutableStateOf(eventName ?: "") }
+
     var eventDate by remember { mutableStateOf(getFormattedDate()) }
     var eventTime by remember { mutableStateOf(getFormattedTime()) }
     var eventDescription by remember { mutableStateOf("") }
