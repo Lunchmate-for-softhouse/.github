@@ -1,16 +1,12 @@
 package com.example.lunchmate.com.example.lunchmate.model
 
 data class Order(
-
-    var name:String,
-    var mealName: String,
-    var drink: String,
-    var mealPrice: Double,
-    var drinkPrice: Double
-)
-{
+    val creator: String = "",
+    val drinkName: String = "",
+    val mealName: String = "",
+    val mealPrice: Double = 0.0,
+    val drinkPrice: Double = 0.0
+) {
     val totalPrice: Double
         get() = mealPrice + drinkPrice
 }
-
-
