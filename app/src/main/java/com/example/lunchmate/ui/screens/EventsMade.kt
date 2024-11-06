@@ -16,8 +16,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
@@ -320,6 +322,37 @@ fun EventItem(event: Event, navController: NavController) {
                     Text("Place Order")
                 }
             }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(
+                    onClick = {
+                        navController.navigate("chat_screen")
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Chat,
+                        contentDescription = "Chat",
+                        tint = Color(0xFF4CAF50)
+                    )
+                }
+
+                IconButton(
+                    onClick = {
+                        navController.navigate("view_order")
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = "Orders",
+                        tint = Color(0xFF4CAF50)
+                    )
+                }
+            }
+
         }
     }
 }
@@ -574,6 +607,38 @@ fun EventCreatorItem(event: Event, navController: NavController, onDeleteConfirm
                 enabled = etaCompleted || remainingTime == "Food has Arrived"
             ) {
                 Text("Set ETA")
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(
+                    onClick = {
+                        navController.navigate("chat_screen")
+                    },
+
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Chat,
+                        contentDescription = "Chat",
+                        tint = Color(0xFF4CAF50)
+                    )
+                }
+
+                IconButton(
+                    onClick = {
+                        navController.navigate("view_order")
+                    },
+                    ) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = "Orders",
+                        tint = Color(0xFF4CAF50)
+                    )
+                }
             }
 
 
