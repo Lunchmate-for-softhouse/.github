@@ -16,8 +16,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
@@ -82,6 +85,31 @@ fun EventsMade(navController: NavController, creatorName: String) {
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 20.sp),
                 color = Color.Black
             )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End // Aligns the button to the right
+            ){
+                Button(
+                    onClick = {
+                        navController.navigate("sign_in")
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF4CAF50),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ExitToApp,
+                        contentDescription = "Logout Icon",
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Sign Out")
+                }
+            }
+
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -132,10 +160,8 @@ fun EventsMade(navController: NavController, creatorName: String) {
                     LazyColumn {
                         items(eventsList.filter { it.location == selectedLocation }) { event ->
                             if (event.createdBy == creatorName) {
-                                println("IM THE CREATOR NOW")
                                 EventCreatorItem(event, navController)
                             } else {
-                                println("IM THE USER NOW")
                                 EventItem(event, navController)
                             }
                             println("Displaying event: ${event.eventName} at ${event.location}")
@@ -261,6 +287,7 @@ fun EventItem(event: Event, navController: NavController) {
                 Button(
                     onClick = {
                         if (isEventEnded) {
+                            nameofevent = event.eventName
                             navController.navigate("review_screen")
                         } else {
                             // Handle Menu action
@@ -292,7 +319,7 @@ fun EventItem(event: Event, navController: NavController) {
                 Spacer(modifier = Modifier.width(4.dp))
                 Text("Created by: ${event.createdBy}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
             }
-            Text("Option: ${event.pickupDineIn}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
+            Text(event.pickupDineIn, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
             Text("People: ${event.peopleCount}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
 
             // Display the correct label based on ETA or event time countdown
@@ -321,6 +348,39 @@ fun EventItem(event: Event, navController: NavController) {
                     Text("Place Order")
                 }
             }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(
+                    onClick = {
+                        nameofevent = event.eventName
+                        navController.navigate("chat_screen")
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Chat,
+                        contentDescription = "Chat",
+                        tint = Color(0xFF4CAF50)
+                    )
+                }
+
+                IconButton(
+                    onClick = {
+                        nameofevent = event.eventName
+                        navController.navigate("view_order")
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = "Orders",
+                        tint = Color(0xFF4CAF50)
+                    )
+                }
+            }
+
         }
     }
 }
@@ -329,18 +389,17 @@ fun EventItem(event: Event, navController: NavController) {
 
 
 @Composable
-fun EventCreatorItem(
-    event: Event,
-    navController: NavController,
-    onDeleteConfirmed: () -> Unit = {}
-) {
+fun EventCreatorItem(event: Event, navController: NavController, onDeleteConfirmed: () -> Unit = {}) {
     var remainingTime by remember { mutableStateOf("Loading...") }
     var remainingTimeEta by remember { mutableStateOf("Loading...") }
     var isEditing by remember { mutableStateOf(false) }
     var eventDate by remember { mutableStateOf(event.eventDate) }
     var eventTime by remember { mutableStateOf(event.eventTime) }
+    var isPickup by remember { mutableStateOf(event.pickupDineIn == "Pickup") }
     var pickupDineInOption by remember { mutableStateOf(event.pickupDineIn) }
     var showEtaInput by remember { mutableStateOf(false) }
+    var estimatedArrivalTime by remember { mutableStateOf(event.estimatedArrivalTime) }
+    var startEtaCountdown by remember { mutableStateOf(false) }
     var etaCompleted by remember { mutableStateOf(false) }
     var isEventEnded by remember { mutableStateOf(event.isEventEnded) }
     var etaStart by remember { mutableStateOf(event.etaStart) }
@@ -354,7 +413,7 @@ fun EventCreatorItem(
 
     // Timer logic to update remaining time and isEventEnded status
     LaunchedEffect(eventDateTime) {
-        while (!event.isEventEnded) {
+        while (!event.isEventEnded or !isEventEnded) {
             try {
                 val eventTimeParsed = dateFormat.parse(eventDateTime) ?: Date()
                 val currentTime = Date()
@@ -385,7 +444,7 @@ fun EventCreatorItem(
         }
     }
 
-    if (event.etaStart || etaStart) {
+    if (event.etaStart or etaStart) {
         LaunchedEffect(event) {
             try {
                 val estimatedTimeString = event.estimatedArrivalTime
@@ -393,24 +452,25 @@ fun EventCreatorItem(
                 val today = calendar.time
                 val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
                 val estimatedTimeOnly = dateFormat.parse(estimatedTimeString) ?: return@LaunchedEffect
-
                 // Set the time from estimatedTimeString onto today's date
                 calendar.time = today
                 calendar.set(Calendar.HOUR_OF_DAY, estimatedTimeOnly.hours)
                 calendar.set(Calendar.MINUTE, estimatedTimeOnly.minutes)
                 calendar.set(Calendar.SECOND, 0)
                 val estimatedTime = calendar.time
+                println("Estimated Time: $estimatedTime" )
 
                 while (event.etaStart) {
                     val currentTime = Date()
                     val timeDiff = estimatedTime.time - currentTime.time
+                    println("timeDiff: $timeDiff" )
                     if (timeDiff > 0) {
                         val hours = (timeDiff / (1000 * 60 * 60)).toInt()
                         val minutes = ((timeDiff / (1000 * 60)) % 60).toInt()
                         val seconds = ((timeDiff / 1000) % 60).toInt()
                         remainingTimeEta = String.format("%02d:%02d:%02d", hours, minutes, seconds)
                     } else {
-                        remainingTimeEta = "Food Arrived"
+                        remainingTimeEta = "Arrived"
                         break
                     }
 
@@ -422,9 +482,9 @@ fun EventCreatorItem(
         }
     }
 
-    // Determine the label for remaining time or ETA display
-    val timeDisplayLabel = if (event.etaStart) "Estimated Time of Arrival" else "Time Left"
-    val timeDisplay = if (event.etaStart) remainingTimeEta else remainingTime
+        // Determine the label for remaining time or ETA display
+    val timeDisplayLabel = if (etaStart) "Estimated Time of Arrival" else "Time Left"
+    val timeDisplay = if (etaStart) remainingTimeEta else remainingTime
 
     Card(
         modifier = Modifier
@@ -474,6 +534,32 @@ fun EventCreatorItem(
                     onValueChange = { eventTime = it },
                     label = { Text("Event Time") }
                 )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextButton(
+                        onClick = {
+                            isPickup = true
+                            pickupDineInOption = "Pickup"
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isPickup) Color(0xFFD1BCE3) else Color(0xFFFBE8E3),
+                            contentColor = Color.Black
+                        )
+                    ) {
+                        Text("Pickup")
+                    }
+                    TextButton(
+                        onClick = {
+                            isPickup = false
+                            pickupDineInOption = "Dine In"
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (!isPickup) Color(0xFFD1BCE3) else Color(0xFFFBE8E3),
+                            contentColor = Color.Black
+                        )
+                    ) {
+                        Text("Dine In")
+                    }
+                }
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(imageVector = Icons.Filled.CalendarToday, contentDescription = "Event Date")
@@ -485,7 +571,7 @@ fun EventCreatorItem(
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("People: ${event.peopleCount}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
                 }
-                Text("Option: ${event.pickupDineIn}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
+                Text("Option: ${if (pickupDineInOption == "Pickup") "Pickup" else "Dine In"}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
             }
 
             // Display the correct label based on ETA or event time countdown
@@ -523,14 +609,16 @@ fun EventCreatorItem(
                                     // Update the event with both etaStart and the calculated arrival time
                                     val updatedEvent = event.copy(
                                         etaStart = true,
-                                        estimatedArrivalTime = calculatedArrivalTime,
-                                        isEventEnded = true
+                                        estimatedArrivalTime = calculatedArrivalTime
                                     )
                                     eventManager.updateEvent(updatedEvent) { success ->
                                         if (!success) {
                                             Log.e("EventCreatorItem", "Failed to update ETA and etaStart in database")
                                         } else {
-                                            etaStart = true
+                                            println("VALUE OF ETASTART: $etaStart")
+                                            etaStart = event.etaStart // Update the local state if needed
+                                            println("Selected ETA: $calculatedArrivalTime")
+                                            // Additional actions like starting a countdown can go here
                                         }
                                     }
                                 }
@@ -540,13 +628,49 @@ fun EventCreatorItem(
                 }
             }
 
-            // Set ETA Button Logic
+
+// Set ETA Button Logic
             Button(
                 onClick = { showEtaInput = !showEtaInput },
-                enabled = !etaStart && !isEventEnded
+                enabled = etaCompleted || remainingTime == "Food has Arrived"
             ) {
                 Text("Set ETA")
             }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(
+                    onClick = {
+                        nameofevent = event.eventName
+                        navController.navigate("chat_screen")
+                    },
+
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Chat,
+                        contentDescription = "Chat",
+                        tint = Color(0xFF4CAF50)
+                    )
+                }
+
+                IconButton(
+                    onClick = {
+                        nameofevent = event.eventName
+                        navController.navigate("view_order")
+                    },
+                    ) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = "Orders",
+                        tint = Color(0xFF4CAF50)
+                    )
+                }
+            }
+
 
             // Event Management Buttons
             Row(
@@ -556,44 +680,38 @@ fun EventCreatorItem(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 if (isEditing) {
-                    Button(
-                        onClick = {
-                            val updatedEvent = event.copy(
-                                eventDate = eventDate,
-                                eventTime = eventTime,
-                                pickupDineIn = pickupDineInOption
-                            )
-                            eventManager.updateEvent(updatedEvent) { success ->
-                                if (success) {
-                                    isEditing = false
-                                } else {
-                                    etaStart = true
-                                    Log.e("EventCreatorItem", "Failed to update event in database")
-                                }
+                    Button(onClick = {
+                        val updatedEvent = event.copy(
+                            eventDate = eventDate,
+                            eventTime = eventTime,
+                            pickupDineIn = pickupDineInOption
+                        )
+                        eventManager.updateEvent(updatedEvent) { success ->
+                            if (success) {
+                                isEditing = false
+                            } else {
+                                Log.e("EventCreatorItem", "Failed to update event in database")
                             }
-                        },
-                        enabled = !etaStart && !isEventEnded
-                    ) {
+                        }
+                    }) {
                         Text("Save")
                     }
+                    Button(onClick = { isEditing = false }) {
+                        Text("Cancel")
+                    }
                 } else {
-                    Button(
-                        onClick = { isEditing = true },
-                        enabled = !etaStart && !isEventEnded
-                    ) {
+                    Button(onClick = { isEditing = true }) {
                         Text("Edit")
                     }
-                }
-                Button(
-                    onClick = { onDeleteConfirmed() },
-                    enabled = !etaStart && !isEventEnded
-                ) {
-                    Text("Delete")
+                    Button(onClick = onDeleteConfirmed) {
+                        Text("Delete")
+                    }
                 }
             }
         }
     }
 }
+
 
 
 
