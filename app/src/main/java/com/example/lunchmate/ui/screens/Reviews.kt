@@ -26,10 +26,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
-import java.util.*
+
 
 @Composable
 fun Reviews(navController: NavController) {

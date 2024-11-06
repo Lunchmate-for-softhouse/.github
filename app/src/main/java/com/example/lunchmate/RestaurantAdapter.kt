@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.lunchmate.model.Restaurant
 import androidx.navigation.NavController
 import com.example.lunchmate.ui.screens.CreateEvents
-import com.example.lunchmate.ui.screens.chaneloc
+import com.example.lunchmate.chaneloc
 
 
 class RestaurantAdapter(

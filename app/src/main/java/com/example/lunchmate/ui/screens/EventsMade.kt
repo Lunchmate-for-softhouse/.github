@@ -28,6 +28,7 @@ import java.util.*
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.ui.text.font.FontWeight
+import com.example.lunchmate.chaneloc
 
 var nameofevent= ""
 val etaOptions = (1..15).map { i -> String.format("%02d:%02d", i / 6, (i % 6) * 10) } // Generate times from 00:10 to 02:30

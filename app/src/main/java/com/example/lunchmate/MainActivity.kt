@@ -46,14 +46,13 @@ import com.example.lunchmate.ui.screens.EventsMade
 
 import com.example.lunchmate.ui.screens.ViewOrder
 
-import com.example.lunchmate.ui.screens.chaneloc
 import com.example.lunchmate.ui.screens.eventcreator
 import com.example.lunchmate.ui.screens.nameofevent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-
+var chaneloc =""
 var event= ""
 
 
