@@ -16,24 +16,6 @@ import androidx.navigation.NavHostController
 
 @Composable
 fun SwishPage(navController: NavHostController, context: Context) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "Open Swish App")
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = { launchSwishApp(context) }) {
-            Text(text = "Open Swish")
-        }
-    }
-}
-
-private fun launchSwishApp(context: Context) {
     val swishPackageName = "se.swish.swish"
     val launchIntent = context.packageManager.getLaunchIntentForPackage(swishPackageName)
 
@@ -57,3 +39,27 @@ private fun launchSwishApp(context: Context) {
     }
 }
 
+/*private fun launchSwishApp(context: Context) {
+    val swishPackageName = "se.swish.swish"
+    val launchIntent = context.packageManager.getLaunchIntentForPackage(swishPackageName)
+
+    if (launchIntent != null) {
+        Log.d("SwishApp", "Launching Swish app")
+        context.startActivity(launchIntent)
+    } else {
+        // If the explicit intent doesn't work, try a more general approach
+        val uri = Uri.parse("swish://") // Example of a deep link
+        val deepLinkIntent = Intent(Intent.ACTION_VIEW, uri)
+        deepLinkIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+        try {
+            context.startActivity(deepLinkIntent)
+        } catch (e: Exception) {
+            Log.d("SwishApp", "Swish app not found. Redirecting to Play Store.")
+            val playStoreIntent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$swishPackageName"))
+            context.startActivity(playStoreIntent)
+            Toast.makeText(context, "Swish app is not installed. Redirecting to Play Store.", Toast.LENGTH_SHORT).show()
+        }
+    }
+}
+*/

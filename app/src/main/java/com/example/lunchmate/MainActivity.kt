@@ -8,12 +8,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import com.example.lunchmate.ui.screens.GoogleRegisterPage
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavType
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -36,19 +38,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.navigation.activity
 import com.example.lunchmate.com.example.lunchmate.ui.screens.ViewOrder
 //import com.example.lunchmate.com.example.lunchmate.ui.screens.ReviewPage
 import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.EventDetails
 import com.example.lunchmate.ui.screens.EventPage
 import com.example.lunchmate.ui.screens.EventsMade
+import com.example.lunchmate.ui.screens.Orignalcreator
 import com.example.lunchmate.ui.screens.ReviewNotificationWorker
+import com.example.lunchmate.ui.screens.SwishPage
 import com.example.lunchmate.ui.screens.chaneloc
 import com.example.lunchmate.ui.screens.eventcreator
+import com.example.lunchmate.ui.screens.makeSwishPaymentRequest
 import com.example.lunchmate.ui.screens.nameofevent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import com.example.lunchmate.ui.screens.*
+import com.example.lunchmate.ui.theme.LunchMateTheme
 
 
 class MainActivity : ComponentActivity() {
@@ -68,11 +76,23 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Initialize Firebase
+        FirebaseApp.initializeApp(this)
 
-        // Delay Firebase initialization if not immediately needed
-        GlobalScope.launch(Dispatchers.IO) {
-            FirebaseApp.initializeApp(applicationContext)
+        setContent {
+            LunchMateTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = Color(0xFF0A0A23) // Default app background color
+                ) {
+                    MainAppNavHost(context = this, shouldNavigateToReview, activity = this) // Pass the activity to the navigation host
+                }
+            }
         }
+        // Delay Firebase initialization if not immediately needed
+        //GlobalScope.launch(Dispatchers.IO) {
+        //    FirebaseApp.initializeApp(applicationContext)
+        //}
 
         // Register permission launcher for notifications
         notificationPermissionLauncher = registerForActivityResult(
@@ -101,7 +121,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color(0xFF0A0A23) // Default app background color
                 ) {
-                    MainAppNavHost(context = this, shouldNavigateToReview) // Pass the navigation flag
+                    MainAppNavHost(context = this, shouldNavigateToReview, activity = this) // Pass the navigation flag
                 }
             }
         }
@@ -147,7 +167,7 @@ class MainActivity : ComponentActivity() {
 // Composable navigation host for the app
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
+fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean, activity: MainActivity) {
     var userstore = ""
 
 
@@ -158,7 +178,7 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
             HomePage(navController = navController)
         }
         composable("sign_in") {
-            SignInPage(navController = navController) // Sign-in screen
+            SignInPage(navController = navController, activity = activity) // Sign-in screen
         }
         composable("register") {
             RegisterPage(navController = navController) // Register screen
@@ -167,6 +187,21 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
         composable("macp") {
             MapsActivityCurrentPlaceScreen(navController = navController) //
         }
+
+        composable("swish_screen") {
+            //SwishPage(navController = navController, context)
+            makeSwishPaymentRequest(context,Orignalcreator) //
+        }
+
+        // Google Registration page
+        composable(
+            route = "google_registration_page/{username}", // Matches navigate call's path
+            arguments = listOf(navArgument("username") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val username = backStackEntry.arguments?.getString("username") ?: ""
+            GoogleRegisterPage(navController = navController, username = username)
+        }
+
 
         composable(
             route = "main_page/{username}",

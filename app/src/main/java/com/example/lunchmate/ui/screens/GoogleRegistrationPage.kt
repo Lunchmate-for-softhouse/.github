@@ -20,7 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GoogleRegistrationPage(navController: NavController, username: String) {
+fun GoogleRegisterPage(navController: NavController, username: String) {
     var swishNumber by remember { mutableStateOf("") }
     var selectedLocation by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) } // Controls dropdown visibility

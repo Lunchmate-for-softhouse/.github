@@ -258,7 +258,10 @@ fun EventPage(navController: NavController, restaurantName: String, creatorName:
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(
-                onClick = { showDialog = true },
+                onClick = {
+                    navController.navigate("swish_screen")
+                    //makeSwishPaymentRequest(context, Orignalcreator)
+                },
                 modifier = Modifier.weight(1f).padding(end = 8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF65558F))
             ) {
@@ -268,11 +271,16 @@ fun EventPage(navController: NavController, restaurantName: String, creatorName:
             Button(
                 onClick = {
                     if (orders.isEmpty()) {
-                        showErrorDialog = true
+                        //showErrorDialog = true
+                        //navController.navigate("swish_screen")
+
                     } else {
                         totalPrice = orders.sumOf { order -> order.totalPrice }
                         showDialog = true
                     }
+
+
+
                 },
                 modifier = Modifier
                     .weight(1f)
@@ -291,6 +299,8 @@ fun EventPage(navController: NavController, restaurantName: String, creatorName:
                 onConfirm = {
                     (context as? MainActivity)?.confirmOrder()
                     showDialog = false
+                    //navController.navigate("swish_screen")
+
                 }
             )
         }

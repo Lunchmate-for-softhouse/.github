@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.lunchmate"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -83,6 +83,7 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.androidx.espresso.core)
     implementation(libs.firebase.storage.ktx)
+    implementation(libs.firebase.auth.ktx)
     //implementation(libs.places)
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose")
@@ -117,7 +118,10 @@ dependencies {
     implementation ("androidx.compose.material3:material3:<latest-version>")
     implementation ("androidx.work:work-runtime-ktx:2.7.1")
     implementation("io.coil-kt:coil-compose:2.2.2") // use the latest version
+    // Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
 
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
 
 
 
