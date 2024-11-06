@@ -83,7 +83,7 @@ class ResturantListActivity : AppCompatActivity() {
     }
     /*
     private fun openRestaurantList() {
-        val intent = Intent(this@ResturantListActivity, MapsActivityCurrentPlace::class.java)
+       // val intent = Intent(this@ResturantListActivity, MapsActivityCurrentPlace::class.java)
         startActivity(intent)
     }
 */
