@@ -36,13 +36,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.lunchmate.com.example.lunchmate.ui.screens.ViewOrder
 //import com.example.lunchmate.com.example.lunchmate.ui.screens.ReviewPage
 import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.EventDetails
 import com.example.lunchmate.ui.screens.EventPage
 import com.example.lunchmate.ui.screens.EventsMade
 import com.example.lunchmate.ui.screens.ReviewNotificationWorker
+//import com.example.lunchmate.ui.screens.ViewOrder
 import com.example.lunchmate.ui.screens.chaneloc
 import com.example.lunchmate.ui.screens.eventcreator
 import com.example.lunchmate.ui.screens.nameofevent
@@ -223,7 +223,7 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
         }
         composable("view_order")
         {
-            ViewOrder()
+            //ViewOrder(navController = navController, nameofevent, chaneloc, userstore)
         }
 
         // Add the ReviewPage composable
