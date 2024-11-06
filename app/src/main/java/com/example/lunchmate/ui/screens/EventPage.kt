@@ -1,5 +1,6 @@
 package com.example.lunchmate.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,221 +13,220 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.lunchmate.MainActivity
-import com.example.lunchmate.com.example.lunchmate.model.Order
+import com.google.firebase.firestore.FirebaseFirestore
 
+// Order data class
+data class Order(
+    var mealName: String = "",
+    var mealPrice: Double = 0.0,
+    var drinkName: String = "",
+    var drinkPrice: Double = 0.0,
+    var eventName: String = "",
+    var location: String = "",
+    var creator: String = ""
+)
 
-
-
+// Event order screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventPage(navController: NavController, restaurantName: String, creatorName:String) {
-    val context = LocalContext.current // Get the current context
-    var inputMeal by remember { mutableStateOf("") }       // For meal name
-    var inputDrink by remember { mutableStateOf("") }      // For drink name
-    var inputMealPrice by remember { mutableStateOf("") }  // For meal price
-    var inputDrinkPrice by remember { mutableStateOf("") } // For drink price
-    var showDialog by remember { mutableStateOf(false) }
-    var showErrorDialog by remember { mutableStateOf(false) }
+fun EventPage(navController: NavController, eventName: String, location: String, creatorName: String) {
+    var mealName by remember { mutableStateOf("") }
+    var mealPrice by remember { mutableStateOf("") }
+    var drinkName by remember { mutableStateOf("") }
+    var drinkPrice by remember { mutableStateOf("") }
     var orders by remember { mutableStateOf(listOf<Order>()) }
-    var totalPrice by remember { mutableStateOf(0.0) }
-
+    var showErrorDialog by remember { mutableStateOf(false) }
+    val db = FirebaseFirestore.getInstance()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFEE9E7))
-            .padding(16.dp),
-        verticalArrangement = Arrangement.SpaceBetween
+            .background(Color(0xFFF5F5F5))
+            .padding(16.dp)
     ) {
-        // Header with restaurant name and back button
+        // Header Row with back navigation and title
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFECE6F0))
-                .padding(vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(vertical = 16.dp)
         ) {
-            IconButton(
-                onClick = { navController.navigateUp() },
-                modifier = Modifier.size(48.dp)
-            ) {
+            IconButton(onClick = { navController.navigateUp() }) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color.Black
+                    tint = Color(0xFF6C4E90)
                 )
             }
-
-            Spacer(modifier = Modifier.width(10.dp))
-
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = restaurantName,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.weight(1f),
-                fontSize = 24.sp,
-                color = Color.Black
+                text = "$eventName - $location",
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 24.sp),
+                color = Color(0xFF333333),
+                fontWeight = FontWeight.Bold
             )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Menu and Reviews buttons
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Button(
-                onClick = { /* Handle Menu button click */ },
-                modifier = Modifier.weight(1f).padding(end = 8.dp)
-            ) {
-                Text("Menu")
-            }
-
-            Button(
-                onClick = { /* Handle Reviews button click */ },
-                modifier = Modifier.weight(1f).padding(start = 8.dp)
-            ) {
-                Text("Reviews")
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Your selected orders section
-        Text(
-            text = "Your Selected Orders",
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(vertical = 10.dp),
-            color = Color.Black
+        // Input Fields for Meals
+        TextField(
+            value = mealName,
+            onValueChange = { mealName = it },
+            label = { Text("Meal Name") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White, shape = MaterialTheme.shapes.medium)
+                .padding(4.dp),
+            colors = TextFieldDefaults.textFieldColors(containerColor = Color.White)
         )
-
-        // Row for inputting meal name and price
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextField(
-                value = inputMeal,
-                onValueChange = { inputMeal = it },
-                placeholder = { Text("Meal name") },
-                modifier = Modifier.weight(2f).height(60.dp),
-                colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xFFECE6F0))
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            TextField(
-                value = inputMealPrice,
-                onValueChange = {
-                    inputMealPrice = it.filter { char -> char.isDigit() || char == '.' }
-                },
-                placeholder = { Text("Meal Price") },
-                modifier = Modifier.weight(1f).height(60.dp),
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xFFECE6F0)),
-                trailingIcon = { Text("kr", color = Color.Gray) }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Row for inputting drink name and price
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextField(
-                value = inputDrink,
-                onValueChange = { inputDrink = it },
-                placeholder = { Text("Drink name") },
-                modifier = Modifier.weight(2f).height(60.dp),
-                colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xFFECE6F0))
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            TextField(
-                value = inputDrinkPrice,
-                onValueChange = {
-                    inputDrinkPrice = it.filter { char -> char.isDigit() || char == '.' }
-                },
-                placeholder = { Text("Drink Price") },
-                modifier = Modifier.weight(1f).height(60.dp),
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xFFECE6F0)),
-                trailingIcon = { Text("kr", color = Color.Gray) }
-            )
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Add button with "+" symbol
+        TextField(
+            value = mealPrice,
+            onValueChange = { mealPrice = it },
+            label = { Text("Meal Price") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White, shape = MaterialTheme.shapes.medium)
+                .padding(4.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            colors = TextFieldDefaults.textFieldColors(containerColor = Color.White)
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Input Fields for Drinks
+        TextField(
+            value = drinkName,
+            onValueChange = { drinkName = it },
+            label = { Text("Drink Name") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White, shape = MaterialTheme.shapes.medium)
+                .padding(4.dp),
+            colors = TextFieldDefaults.textFieldColors(containerColor = Color.White)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextField(
+            value = drinkPrice,
+            onValueChange = { drinkPrice = it },
+            label = { Text("Drink Price") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White, shape = MaterialTheme.shapes.medium)
+                .padding(4.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            colors = TextFieldDefaults.textFieldColors(containerColor = Color.White)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Button(
             onClick = {
-                if (inputMeal.isNotBlank() && inputDrink.isNotBlank() && inputMealPrice.isNotBlank() && inputDrinkPrice.isNotBlank()) {
-                    val mealPriceValue = inputMealPrice.toDoubleOrNull() ?: 0.0
-                    val drinkPriceValue = inputDrinkPrice.toDoubleOrNull() ?: 0.0
+                val priceMeal = mealPrice.toDoubleOrNull()
+                val priceDrink = drinkPrice.toDoubleOrNull()
+                if (mealName.isNotEmpty() && priceMeal != null || drinkName.isNotEmpty() && priceDrink != null) {
                     val order = Order(
-                        name = "${creatorName}",
-                        mealName = inputMeal,
-                        drink = inputDrink,
-                        mealPrice = mealPriceValue,
-                        drinkPrice = drinkPriceValue
+                        mealName = mealName,
+                        mealPrice = priceMeal ?: 0.0,
+                        drinkName = drinkName,
+                        drinkPrice = priceDrink ?: 0.0,
+                        eventName = eventName,
+                        location = location,
+                        creator = creatorName
                     )
-
                     orders = orders + order
-                    inputMeal = ""
-                    inputDrink = ""
-                    inputMealPrice = ""
-                    inputDrinkPrice = ""
+                    mealName = ""
+                    mealPrice = ""
+                    drinkName = ""
+                    drinkPrice = ""
+                } else {
+                    showErrorDialog = true
                 }
             },
             modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .width(64.dp)
-                .height(64.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF65558F))
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6C4E90)),
+            shape = MaterialTheme.shapes.medium
         ) {
-            Text("+", color = Color.White, fontSize = 25.sp)
+            Text("Add Order", color = Color.White)
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // LazyColumn to display added orders
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth().weight(1f)
-        ) {
+        Text(
+            text = "Order Summary",
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+            color = Color(0xFF333333)
+        )
+
+        LazyColumn {
             items(orders) { order ->
-                OrderCard(
-                    order = order,
-                    onRemoveClick = {
-                        orders = orders.filter { it != order }
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .shadow(4.dp, shape = MaterialTheme.shapes.medium),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            if (order.mealName.isNotEmpty()) {
+                                Text("Meal: ${order.mealName}", fontWeight = FontWeight.Bold)
+                                Text("Price: ${order.mealPrice} SEK", color = Color.Gray)
+                            }
+                            if (order.drinkName.isNotEmpty()) {
+                                Text("Drink: ${order.drinkName}", fontWeight = FontWeight.Bold)
+                                Text("Price: ${order.drinkPrice} SEK", color = Color.Gray)
+                            }
+                        }
+                        IconButton(
+                            onClick = { orders = orders - order },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Delete",
+                                tint = Color.Red
+                            )
+                        }
                     }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+                }
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.weight(1f))
 
-        // Row for Confirm and Pay by Swish buttons
+        // Payment and Confirm Order buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(
-                onClick = { showDialog = true },
+                onClick = {navController.navigate("swish_screen") },
                 modifier = Modifier.weight(1f).padding(end = 8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF65558F))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                shape = MaterialTheme.shapes.medium
             ) {
-                Text("Pay by Swish")
+                Text("Swish", color = Color.White)
             }
 
             Button(
@@ -234,107 +234,52 @@ fun EventPage(navController: NavController, restaurantName: String, creatorName:
                     if (orders.isEmpty()) {
                         showErrorDialog = true
                     } else {
-                        totalPrice = orders.sumOf { order -> order.totalPrice }
-                        showDialog = true
+                        saveOrdersToDatabase(db, orders) {
+                            navController.navigate("current_orders")
+                        }
                     }
                 },
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF65558F))
+                modifier = Modifier.weight(1f).padding(start = 8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6C4E90)),
+                shape = MaterialTheme.shapes.medium
             ) {
-                Text("Confirm Order")
+                Text("Confirm Order", color = Color.White)
             }
         }
 
-        // Confirmation Dialog
-        /*
-        if (showDialog) {
-            OrderConfirmationDialog(
-                totalPrice = totalPrice,
-                onDismiss = { showDialog = false },
-                onConfirm = {
-                    (context as? MainActivity)?.confirmOrder()
-                    showDialog = false
-                }
-            )
-        }
-        */
-
-
-        // Error Dialog for no selected orders
         if (showErrorDialog) {
-            ErrorDialog(
-                onDismiss = { showErrorDialog = false }
+            AlertDialog(
+                onDismissRequest = { showErrorDialog = false },
+                confirmButton = {
+                    TextButton(onClick = { showErrorDialog = false }) {
+                        Text("Ok", color = Color(0xFF6C4E90))
+                    }
+                },
+                title = {
+                    Text("Error", style = MaterialTheme.typography.titleMedium.copy(color = Color.Red))
+                },
+                text = { Text("Please ensure all fields are filled correctly.") }
             )
         }
     }
 }
 
-// OrderCard composable function
-@Composable
-fun OrderCard(order: Order, onRemoveClick: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = "${order.name} + ${order.drink}: ${order.totalPrice} kr", style = MaterialTheme.typography.bodyLarge)
+// Function to save orders to Firestore
+fun saveOrdersToDatabase(db: FirebaseFirestore, orders: List<Order>, onComplete: () -> Unit) {
+    val batch = db.batch()
+    val collectionRef = db.collection("Orders")
 
-            IconButton(onClick = { onRemoveClick() }) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Remove order",
-                    tint = Color.Red
-                )
-            }
+    for (order in orders) {
+        val newOrderRef = collectionRef.document()
+        batch.set(newOrderRef, order)
+    }
+
+    batch.commit().addOnCompleteListener {
+        if (it.isSuccessful) {
+            Log.d("Firestore", "Orders successfully written!")
+            onComplete()
+        } else {
+            Log.w("Firestore", "Error writing orders", it.exception)
         }
     }
 }
-
-// OrderConfirmationDialog composable function
-@Composable
-fun OrderConfirmationDialog(
-    totalPrice: Double,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            Button(onClick = onConfirm) {
-                Text("Confirm")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        },
-        title = { Text(text = "Confirm Order") },
-        text = { Text("Total price is: $totalPrice kr. Do you want to confirm the order?") }
-    )
-}
-
-// ErrorDialog composable function
-@Composable
-fun ErrorDialog(onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            Button(onClick = onDismiss) {
-                Text("OK")
-            }
-        },
-        title = { Text(text = "Error") },
-        text = { Text("No orders selected. Please select an order before proceeding.") }
-    )
-}
-
-

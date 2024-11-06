@@ -1,6 +1,7 @@
 package com.example.lunchmate
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -102,7 +103,6 @@ fun MapsScreen(navController: NavController) {
       //  }
 
 
-
         // Show dialog if selectedRestaurantName is not null
         if (showDialog && selectedRestaurantName != null) {
 
@@ -122,9 +122,6 @@ fun MapsScreen(navController: NavController) {
                             Text("Create")
                         }
                     }
-
-
-
                 },
                 confirmButton = {},
                 dismissButton = {}
