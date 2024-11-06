@@ -45,7 +45,7 @@ import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.EventDetails
 import com.example.lunchmate.ui.screens.EventPage
 import com.example.lunchmate.ui.screens.EventsMade
-import com.example.lunchmate.ui.screens.Orignalcreator
+import com.example.lunchmate.ui.screens.Originalcreator
 import com.example.lunchmate.ui.screens.ReviewNotificationWorker
 import com.example.lunchmate.ui.screens.SwishPage
 import com.example.lunchmate.ui.screens.chaneloc
@@ -190,7 +190,7 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean, activity: 
 
         composable("swish_screen") {
             //SwishPage(navController = navController, context)
-            makeSwishPaymentRequest(context,Orignalcreator) //
+            makeSwishPaymentRequest(context = context, username = userstore, eventName = nameofevent, location = chaneloc) //
         }
 
         // Google Registration page

@@ -18,6 +18,7 @@
     import com.google.firebase.firestore.FirebaseFirestore
     import okhttp3.*
     import java.io.IOException
+    import java.security.cert.X509Certificate
     import javax.net.ssl.*
 
 // Function to create OkHttp client with Swish client certificate
@@ -25,33 +26,26 @@ fun createSwishOkHttpClient(context: Context): OkHttpClient {
     try {
         // Load the client certificate from res/raw
         val keyStore = KeyStore.getInstance("PKCS12").apply {
-            val certInputStream: InputStream = context.resources.openRawResource(R.raw.certificate) // Your client certificate
-            load(certInputStream, "123456".toCharArray()) // Your client certificate password
+            val certInputStream: InputStream = context.resources.openRawResource(R.raw.certificates) // Your .p12 client certificate
+            load(certInputStream, "swish".toCharArray()) // Your .p12 certificate password
             certInputStream.close()
         }
 
-        // Load CA certificate from res/raw (replace with your actual CA cert filename)
-        val caInputStream: InputStream = context.resources.openRawResource(R.raw.swish_ca_certificate) // Your CA certificate
-        val caKeyStore = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
-            load(null, null) // Create an empty KeyStore
-            setCertificateEntry("ca", CertificateFactory.getInstance("X.509").generateCertificate(caInputStream))
-        }
-        caInputStream.close()
-
-        // Initialize TrustManager with the CA certificate
-        val trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
-        trustManagerFactory.init(caKeyStore)
-
         // Initialize KeyManager with the client certificate
         val keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
-        keyManagerFactory.init(keyStore, "123456".toCharArray()) // Your client certificate password
+        keyManagerFactory.init(keyStore, "swish".toCharArray()) // Your .p12 certificate password
 
-        // Create SSLContext with both KeyManager and TrustManager
+        // Initialize SSLContext with the KeyManager
         val sslContext = SSLContext.getInstance("TLSv1.2").apply {
-            init(keyManagerFactory.keyManagers, trustManagerFactory.trustManagers, null)
+            init(keyManagerFactory.keyManagers, null, null)
         }
 
-        val trustManager = trustManagerFactory.trustManagers[0] as X509TrustManager
+        // Create an all-accepting TrustManager if necessary
+        val trustManager = object : X509TrustManager {
+            override fun checkClientTrusted(chain: Array<X509Certificate?>?, authType: String?) {}
+            override fun checkServerTrusted(chain: Array<X509Certificate?>?, authType: String?) {}
+            override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+        }
 
         // Build the OkHttpClient with SSL settings
         return OkHttpClient.Builder()
@@ -63,17 +57,15 @@ fun createSwishOkHttpClient(context: Context): OkHttpClient {
     }
 }
 
-fun sendSwishPaymentRequest(context: Context, swishNumber: String, amount: Double) {
-    if (amount <= 0) {
-        Log.e("SwishPayment", "Invalid payment amount: $amount")
-        return
-    }
+
+
+fun sendSwishPaymentRequest(context: Context, swishNumber: String, eventName: String, location: String) {
 
     val client = createSwishOkHttpClient(context)
     val jsonPayload = """
         {
             "payeeAlias": "$swishNumber",
-            "amount": "$amount",
+            "amount": "100",
             "currency": "SEK",
             "message": "Payment for Order",
             "callbackUrl": "https://holly-royal-teal.glitch.me/paymentcallback"
@@ -105,7 +97,7 @@ fun sendSwishPaymentRequest(context: Context, swishNumber: String, amount: Doubl
 }
 
 // Main function to make the Swish payment request by querying Firestore for Swish number and total price
-    fun makeSwishPaymentRequest(context: Context, username: String) {
+    fun makeSwishPaymentRequest(context: Context, username: String, eventName: String, location: String) {
         val db = FirebaseFirestore.getInstance()
 
         // Step 1: Retrieve user document to get the Swish number
@@ -139,8 +131,9 @@ fun sendSwishPaymentRequest(context: Context, swishNumber: String, amount: Doubl
                         val eventId = eventDoc.id
 
                         // Step 3: Retrieve the order associated with the event to get the total price
-                        db.collection("orders")
-                            .whereEqualTo("eventId", eventId)
+                        db.collection("Orders")
+                            .whereEqualTo("eventName", eventName)
+                            .whereEqualTo("location", location)
                             .get()
                             .addOnSuccessListener { orderDocuments ->
                                 if (orderDocuments.isEmpty) {
@@ -152,7 +145,7 @@ fun sendSwishPaymentRequest(context: Context, swishNumber: String, amount: Doubl
                                 val totalPrice = orderDoc.getDouble("totalPrice") ?: 0.0
 
                                 // Proceed to create the Swish payment request with the retrieved data
-                                sendSwishPaymentRequest(context, swishNumber, totalPrice)
+                                sendSwishPaymentRequest(context, swishNumber, eventName, location)
                             }
                             .addOnFailureListener { e ->
                                 Log.e("SwishPayment", "Error retrieving order: ${e.message}", e)
