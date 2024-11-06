@@ -160,10 +160,8 @@ fun EventsMade(navController: NavController, creatorName: String) {
                     LazyColumn {
                         items(eventsList.filter { it.location == selectedLocation }) { event ->
                             if (event.createdBy == creatorName) {
-                                println("IM THE CREATOR NOW")
                                 EventCreatorItem(event, navController)
                             } else {
-                                println("IM THE USER NOW")
                                 EventItem(event, navController)
                             }
                             println("Displaying event: ${event.eventName} at ${event.location}")
@@ -289,6 +287,7 @@ fun EventItem(event: Event, navController: NavController) {
                 Button(
                     onClick = {
                         if (isEventEnded) {
+                            nameofevent = event.eventName
                             navController.navigate("review_screen")
                         } else {
                             // Handle Menu action
