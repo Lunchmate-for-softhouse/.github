@@ -6,8 +6,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,6 +39,8 @@ fun EventPage(navController: NavController, restaurantName: String, creatorName:
     var showErrorDialog by remember { mutableStateOf(false) }
     var orders by remember { mutableStateOf(listOf<Order>()) }
     var totalPrice by remember { mutableStateOf(0.0) }
+    val mealAdditions = remember { mutableStateListOf<String>() }
+    val mealRemovals = remember { mutableStateListOf<String>() }
 
 
     Column(
@@ -107,74 +112,105 @@ fun EventPage(navController: NavController, restaurantName: String, creatorName:
             color = Color.Black
         )
 
-        // Row for inputting meal name and price
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextField(
-                value = inputMeal,
-                onValueChange = { inputMeal = it },
-                placeholder = { Text("Meal name") },
-                modifier = Modifier.weight(2f).height(60.dp),
-                colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xFFECE6F0))
-            )
+        // Row for inputting meal name, price, and modifications
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // Row for the main meal input (name)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextField(
+                    value = inputMeal,
+                    onValueChange = { inputMeal = it },
+                    placeholder = { Text("Meal name (e.g., Frisco Meal [Add: Extra Cheese, Remove: Tomatoes])") },
+                    modifier = Modifier.weight(2f).height(60.dp),
+                    colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xFFECE6F0))
+                )
 
-            Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
-            TextField(
-                value = inputMealPrice,
-                onValueChange = {
-                    inputMealPrice = it.filter { char -> char.isDigit() || char == '.' }
-                },
-                placeholder = { Text("Meal Price") },
-                modifier = Modifier.weight(1f).height(60.dp),
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xFFECE6F0)),
-                trailingIcon = { Text("kr", color = Color.Gray) }
-            )
+                IconButton(onClick = { mealAdditions.add("") }) {
+                    Icon(Icons.Default.Add, contentDescription = "Add Item")
+                }
+
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Row for the meal price input
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextField(
+                    value = inputMealPrice.orEmpty(),
+                    onValueChange = {
+                        inputMealPrice = it.takeIf { it.isNotEmpty() }?.filter { char -> char.isDigit() || char == '.' }
+                            .toString()
+                    },
+                    placeholder = { Text("Meal Price") },
+                    modifier = Modifier.weight(1f).height(60.dp),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xFFECE6F0)),
+                    trailingIcon = { Text("kr", color = Color.Gray) }
+                )
+            }
+
+            // Display additional fields for additions
+            mealAdditions.forEachIndexed { index, addition ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextField(
+                        value = addition,
+                        onValueChange = { mealAdditions[index] = it },
+                        placeholder = { Text("Add item (e.g., Cheese, Wings)") },
+                        modifier = Modifier.weight(1f).height(50.dp),
+                        colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xFFECE6F0))
+                    )
+
+                    IconButton(onClick = { mealAdditions.removeAt(index) }) {
+                        Icon(Icons.Default.Clear, contentDescription = "Remove Add Item")
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            // Display additional fields for removals
+            mealRemovals.forEachIndexed { index, removal ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextField(
+                        value = removal,
+                        onValueChange = { mealRemovals[index] = it },
+                        placeholder = { Text("Remove item (e.g., Tomatoes, Sauce)") },
+                        modifier = Modifier.weight(1f).height(50.dp),
+                        colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xFFECE6F0))
+                    )
+
+                    IconButton(onClick = { mealRemovals.removeAt(index) }) {
+                        Icon(Icons.Default.Clear, contentDescription = "Remove Remove Item")
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Row for inputting drink name and price
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextField(
-                value = inputDrink,
-                onValueChange = { inputDrink = it },
-                placeholder = { Text("Drink name") },
-                modifier = Modifier.weight(2f).height(60.dp),
-                colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xFFECE6F0))
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            TextField(
-                value = inputDrinkPrice,
-                onValueChange = {
-                    inputDrinkPrice = it.filter { char -> char.isDigit() || char == '.' }
-                },
-                placeholder = { Text("Drink Price") },
-                modifier = Modifier.weight(1f).height(60.dp),
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                colors = TextFieldDefaults.textFieldColors(containerColor = Color(0xFFECE6F0)),
-                trailingIcon = { Text("kr", color = Color.Gray) }
-            )
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Add button with "+" symbol
         Button(
             onClick = {
-                if (inputMeal.isNotBlank() && inputDrink.isNotBlank() && inputMealPrice.isNotBlank() && inputDrinkPrice.isNotBlank()) {
+                if (inputMeal.isNotBlank() || inputDrink.isNotBlank() || inputMealPrice.isNotBlank() || inputDrinkPrice.isNotBlank()) {
                     val mealPriceValue = inputMealPrice.toDoubleOrNull() ?: 0.0
                     val drinkPriceValue = inputDrinkPrice.toDoubleOrNull() ?: 0.0
+
                     val order = Order(
-                        name = "${creatorName}",
+                        name = creatorName,
                         mealName = inputMeal,
                         drink = inputDrink,
                         mealPrice = mealPriceValue,
@@ -282,7 +318,8 @@ fun OrderCard(order: Order, onRemoveClick: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "${order.name} + ${order.drink}: ${order.totalPrice} kr", style = MaterialTheme.typography.bodyLarge)
+
+            Text(text = "${order.mealName} + ${order.drink}: ${order.totalPrice} kr", style = MaterialTheme.typography.bodyLarge)
 
             IconButton(onClick = { onRemoveClick() }) {
                 Icon(
