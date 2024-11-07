@@ -2,4 +2,6 @@
 <resources>
 
     <style name="Theme.LunchMate" parent="Theme.AppCompat.Light.NoActionBar" />
+
+
 </resources>
