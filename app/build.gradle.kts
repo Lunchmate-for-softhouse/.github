@@ -96,7 +96,7 @@ dependencies {
     implementation(libs.androidx.compilercommon)
     implementation(libs.androidx.compose.material) // Verify if this is needed as material3 may cover it
     debugImplementation("androidx.compose.ui:ui-tooling")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose")
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
