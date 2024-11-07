@@ -98,12 +98,12 @@ class EventManager {
 
 
 
-    fun deleteEvent(event: Event, creatorName: String, eventToDelete:String, onDeleteComplete: (Boolean) -> Unit) {
+    fun deleteEvent(creatorName: String, eventToDelete:String, onDeleteComplete: (Boolean) -> Unit) {
         val db = FirebaseFirestore.getInstance()
 
         db.collection("events")
-            .whereEqualTo(eventToDelete, event.eventName)
-            .whereEqualTo(creatorName, event.createdBy)
+            .whereEqualTo("eventName", eventToDelete)
+            .whereEqualTo("createdBy", creatorName)
             .get()
             .addOnSuccessListener { querySnapshot: QuerySnapshot ->
                 if (!querySnapshot.isEmpty) {

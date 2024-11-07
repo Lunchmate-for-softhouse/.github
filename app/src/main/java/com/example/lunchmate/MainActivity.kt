@@ -38,16 +38,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.navigation.activity
 import com.example.lunchmate.com.example.lunchmate.ui.screens.ViewOrder
 //import com.example.lunchmate.com.example.lunchmate.ui.screens.ReviewPage
 import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.EventDetails
 import com.example.lunchmate.ui.screens.EventPage
 import com.example.lunchmate.ui.screens.EventsMade
-import com.example.lunchmate.ui.screens.Originalcreator
 import com.example.lunchmate.ui.screens.ReviewNotificationWorker
-import com.example.lunchmate.ui.screens.SwishPage
 import com.example.lunchmate.ui.screens.chaneloc
 import com.example.lunchmate.ui.screens.eventcreator
 import com.example.lunchmate.ui.screens.makeSwishPaymentRequest
@@ -167,7 +164,7 @@ class MainActivity : ComponentActivity() {
 // Composable navigation host for the app
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean, activity: MainActivity) {
+fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
     var userstore = ""
 
 
@@ -266,13 +263,14 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean, activity: 
         }
         composable("view_order")
         {
-            ViewOrder()
+            ViewOrder(nameofevent ,chaneloc)
+
         }
 
         // Add the ReviewPage composable
-//        composable("review_pag") {
-//            ReviewPage(onBack = { navController.popBackStack() }) // Navigate back to the previous screen
-//        }
+       composable("reviews") {
+            Reviews(navController=navController,userstore) // Navigate back to the previous screen
+        }
     }
 
     // Handle navigation to the review page after the nav host is set up

@@ -21,6 +21,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.firestore.FirebaseFirestore
+var chaneloc = ""
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -151,15 +152,29 @@ fun SignInPage(navController: NavController, activity: Activity) {
                         if (username.isEmpty() || password.isEmpty()) {
                             loginStatus = "Please enter both username and password."
                         } else {
-                            // Query Firestore
+                            // Query Firestore for all users
                             db.collection("users")
-                                .whereEqualTo("username", username)
-                                .whereEqualTo("password", password)
                                 .get()
                                 .addOnSuccessListener { documents ->
                                     Log.d("SignInPage", "Documents fetched: ${documents.size()}")
 
-                                    if (!documents.isEmpty) {
+                                    var userFound = false
+                                    var storedPassword: String? = null
+
+                                    for (document in documents) {
+                                        val storedUsername = document.getString("username")?.lowercase()
+                                        storedPassword = document.getString("password")
+
+                                        // Case-insensitive username comparison
+                                        if (username.lowercase() == storedUsername) {
+                                            userFound = true
+                                            chaneloc = document.getString("location") ?: "Unknown Location" // Update location
+                                            Log.d("SignInPage", "User location: $chaneloc")
+                                            break
+                                        }
+                                    }
+
+                                    if (userFound && password.lowercase() == storedPassword?.lowercase()) {
                                         loginStatus = "Login Successful!"
                                         // Navigate to MainPage with the username
                                         navController.navigate("main_page/$username")
@@ -167,9 +182,9 @@ fun SignInPage(navController: NavController, activity: Activity) {
                                         loginStatus = "Login Failed! Invalid credentials."
                                     }
                                 }
-                                .addOnFailureListener { exception ->
-                                    Log.e("SignInPage", "Error accessing database: ${exception.message}")
-                                    loginStatus = "Error accessing database."
+                                .addOnFailureListener { e ->
+                                    Log.e("SignInPage", "Error fetching documents", e)
+                                    loginStatus = "Login Failed! Please try again."
                                 }
                         }
                     },

@@ -21,7 +21,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.example.lunchmate.ui.screens.chaneloc
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -35,21 +34,10 @@ import okhttp3.Request
 import org.json.JSONObject
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-//import com.example.lunchmate.ui.screens.eventNamer
+
 import androidx.navigation.NavHostController
-import com.example.lunchmate.R
+import com.example.lunchmate.ui.screens.chaneloc
 
-//var userselectedresturant= ""
-
-
-/*class MapsActivityCurrentPlace : ComponentActivity(navController = navController) {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            MapsScreen()
-        }
-    }
-}*/
 @Composable
 fun MapsActivityCurrentPlaceScreen(navController: NavController) {
     // This is the entry point of the MapsActivityCurrentPlace content
@@ -67,23 +55,33 @@ fun MapsScreen(navController: NavController) {
     var selectedRestaurantName by remember { mutableStateOf<String?>(null) }
     var showDialog by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        AndroidView({ mapView }) { map ->
-            map.getMapAsync { googleMap ->
-                setupMap(googleMap, context, navController) { restaurantName ->
-                    // Set the selected restaurant name and show the dialog
-                    selectedRestaurantName = restaurantName
-                    showDialog = true
-                    //userselectedresturant = restaurantName
-
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            // Map view with a weight so it doesn't take up the entire screen
+            AndroidView({ mapView }, modifier = Modifier.weight(1f)) { map ->
+                map.getMapAsync { googleMap ->
+                    setupMap(googleMap, context, navController) { restaurantName ->
+                        selectedRestaurantName = restaurantName
+                        showDialog = true
+                    }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            // Spacer to add padding between map and button
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Button(onClick = { openRestaurantList() }) {
-            Text("Open Restaurant List")
+            // Button to navigate to the restaurant list
+            Button(
+                onClick = { navController.navigate("restaurant_list") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text("View Restaurant List")
+            }
         }
 
         // Show dialog if selectedRestaurantName is not null
@@ -97,17 +95,12 @@ fun MapsScreen(navController: NavController) {
                         Text(text = selectedRestaurantName!!, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(onClick = {
-                            //eventNamer= userselectedresturant
-                            //navController.navigate("create_event")
                             navController.navigate("create_event/${selectedRestaurantName}")
                             showDialog = false
                         }) {
                             Text("Create")
                         }
                     }
-
-
-
                 },
                 confirmButton = {},
                 dismissButton = {}
@@ -115,6 +108,8 @@ fun MapsScreen(navController: NavController) {
 
         }
     }
+
+
 }
 
 @Composable
@@ -175,7 +170,6 @@ private fun setupMap(googleMap: GoogleMap, context: Context, navController: NavC
     }
 }
 
-
 private fun drawCircle(map: GoogleMap, location: LatLng, radius: Int) {
     map.addCircle(
         CircleOptions()
@@ -186,7 +180,6 @@ private fun drawCircle(map: GoogleMap, location: LatLng, radius: Int) {
             .strokeWidth(2f)
     )
 }
-
 private fun searchNearbyRestaurants(location: LatLng, map: GoogleMap, customMarker: BitmapDescriptor, onMarkerClick: (String) -> Unit) {
     val radius = 1000
     val type = "restaurant"
@@ -219,7 +212,6 @@ private fun searchNearbyRestaurants(location: LatLng, map: GoogleMap, customMark
                                 .icon(customMarker)
                         )
                     }
-
                     // Set the OnMarkerClickListener
                     map.setOnMarkerClickListener { marker ->
                         // Get the restaurant name from the marker title
@@ -235,36 +227,10 @@ private fun searchNearbyRestaurants(location: LatLng, map: GoogleMap, customMark
     }
 }
 
-/*@Composable
-fun showRestaurantCardDialog(restaurantName: String, navController: NavController) {
-    var showDialog by remember { mutableStateOf(true) }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text("Restaurant Selected") },
-            text = {
-                Column {
-                    Text(text = restaurantName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = {
-                        navController.navigate("create_event/$restaurantName")
-                        showDialog = false
-                    }) {
-                        Text("Create")
-                    }
-                }
-            },
-            confirmButton = {},
-            dismissButton = {}
-        )
-    }
-}
-*/
-
-
+/*
 private fun openRestaurantList() {
     // Implement the logic to open the restaurant list activity
 }
+ */
 
-private const val DEFAULT_ZOOM = 14
+private const val DEFAULT_ZOOM = 15
