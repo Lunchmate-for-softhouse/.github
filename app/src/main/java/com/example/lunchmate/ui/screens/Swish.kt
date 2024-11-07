@@ -20,6 +20,9 @@
     import java.io.IOException
     import java.security.cert.X509Certificate
     import javax.net.ssl.*
+    import com.example.lunchmate.model.User
+    import androidx.compose.runtime.Composable
+    import androidx.compose.runtime.LaunchedEffect
 
 // Function to create OkHttp client with Swish client certificate
 fun createSwishOkHttpClient(context: Context): OkHttpClient {
@@ -57,47 +60,80 @@ fun createSwishOkHttpClient(context: Context): OkHttpClient {
     }
 }
 
+    // Function to retrieve the User object and initiate the payment request
+   /* fun makeSwishPaymentRequest(context: Context, username: String) {
+        val db = FirebaseFirestore.getInstance()
 
+        // Query the user document based on username to retrieve the Swish number
+        db.collection("users")
+            .whereEqualTo("username", username)
+            .get()
+            .addOnSuccessListener { userDocuments ->
+                if (userDocuments.isEmpty) {
+                    Log.e("SwishPayment", "User with username $username not found.")
+                    return@addOnSuccessListener
+                }
 
-fun sendSwishPaymentRequest(context: Context, swishNumber: String, eventName: String, location: String) {
+                // Convert the document to a User object and get the Swish number
+                val userDoc = userDocuments.documents[0]
+                val user = userDoc.toObject(User::class.java) // Convert to User object
+                val swishNumber = user?.swishNumber
 
-    val client = createSwishOkHttpClient(context)
-    val jsonPayload = """
-        {
-            "payeeAlias": "$swishNumber",
-            "amount": "100",
-            "currency": "SEK",
-            "message": "Payment for Order",
-            "callbackUrl": "https://holly-royal-teal.glitch.me/paymentcallback"
-        }
+                if (swishNumber.isNullOrEmpty()) {
+                    Log.e("SwishPayment", "Swish number is missing for user $username.")
+                    return@addOnSuccessListener
+                }
+
+                // Call the function to send the payment request with the retrieved Swish number
+                sendSwishPaymentRequest(context, swishNumber)
+            }
+            .addOnFailureListener { e ->
+                Log.e("SwishPayment", "Error retrieving user: ${e.message}", e)
+            }
+    }
+
+    // Function to send the Swish payment request with a manually filled amount and message
+    fun sendSwishPaymentRequest(context: Context, swishNumber: String) {
+        val client = createSwishOkHttpClient(context)
+
+        // Manually set amount and message as needed
+        val jsonPayload = """
+    {
+        "payeeAlias": "$swishNumber",
+        "amount": "100",                // Manually set amount here
+        "currency": "SEK",
+        "message": "Payment for Order",  // Manually set message here
+        "callbackUrl": "https://holly-royal-teal.glitch.me/paymentcallback"
+    }
     """.trimIndent()
 
-    // JSON data for the Swish API request, with dynamic Swish number and amount
+        val requestBody = jsonPayload.toRequestBody("application/json".toMediaType())
+        val request = Request.Builder()
+            .url("https://mss.cpc.getswish.net/swish-cpcapi/api/v1/paymentrequests") // Swish API URL
+            .post(requestBody)
+            .build()
 
-    val requestBody = jsonPayload.toRequestBody("application/json".toMediaType())
-    val request = Request.Builder()
-        .url("https://holly-royal-teal.glitch.me/paymentcallback") // Use your callback URL here for testing
-        .post(requestBody)
-        .build()
-
-
-    client.newCall(request).enqueue(object : Callback {
-        override fun onResponse(call: Call, response: Response) {
-            if (response.isSuccessful) {
-                Log.i("SwishPayment", "Payment request successful: ${response.body?.string()}")
-            } else {
-                Log.e("SwishPayment", "Payment request failed with status ${response.code}: ${response.body?.string()}")
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    Log.i("SwishPayment", "Payment request successful: ${response.body?.string()}")
+                } else {
+                    Log.e("SwishPayment", "Payment request failed with status ${response.code}: ${response.body?.string()}")
+                }
             }
-        }
 
-        override fun onFailure(call: Call, e: IOException) {
-            Log.e("SwishPayment", "Payment request failed: ${e.message}", e)
-        }
-    })
-}
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("SwishPayment", "Payment request failed: ${e.message}", e)
+            }
+        })
+    }
 
-// Main function to make the Swish payment request by querying Firestore for Swish number and total price
-    fun makeSwishPaymentRequest(context: Context, username: String, eventName: String, location: String) {
+*/
+
+
+
+    // Function to retrieve the event creator's Swish number and initiate the payment request
+    fun makeSwishPaymentRequest(context: Context, username: String) {
         val db = FirebaseFirestore.getInstance()
 
         // Step 1: Retrieve user document to get the Swish number
@@ -117,49 +153,167 @@ fun sendSwishPaymentRequest(context: Context, swishNumber: String, eventName: St
                     return@addOnSuccessListener
                 }
 
-                // Step 2: Find the event created by this user
-                db.collection("events")
-                    .whereEqualTo("createdBy", username)
-                    .get()
-                    .addOnSuccessListener { eventDocuments ->
-                        if (eventDocuments.isEmpty) {
-                            Log.e("SwishPayment", "No event found for user $username.")
-                            return@addOnSuccessListener
-                        }
-
-                        val eventDoc = eventDocuments.documents[0]
-                        val eventId = eventDoc.id
-
-                        // Step 3: Retrieve the order associated with the event to get the total price
-                        db.collection("Orders")
-                            .whereEqualTo("eventName", eventName)
-                            .whereEqualTo("location", location)
-                            .get()
-                            .addOnSuccessListener { orderDocuments ->
-                                if (orderDocuments.isEmpty) {
-                                    Log.e("SwishPayment", "No order found for event ID $eventId.")
-                                    return@addOnSuccessListener
-                                }
-
-                                val orderDoc = orderDocuments.documents[0]
-                                val totalPrice = orderDoc.getDouble("totalPrice") ?: 0.0
-
-                                // Proceed to create the Swish payment request with the retrieved data
-                                sendSwishPaymentRequest(context, swishNumber, eventName, location)
-                            }
-                            .addOnFailureListener { e ->
-                                Log.e("SwishPayment", "Error retrieving order: ${e.message}", e)
-                            }
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("SwishPayment", "Error retrieving event: ${e.message}", e)
-                    }
+                // Call the function to send the payment request with the retrieved Swish number
+                sendSwishPaymentRequest(context, swishNumber)
             }
             .addOnFailureListener { e ->
                 Log.e("SwishPayment", "Error retrieving user: ${e.message}", e)
             }
     }
 
+    // Function to create and send the Swish payment request with a manually filled amount and message
+    fun sendSwishPaymentRequest(context: Context, swishNumber: String) {
+        val client = createSwishOkHttpClient(context)
+
+        // Manually fill in the remaining fields as needed
+        val jsonPayload = """
+        {
+            "payeeAlias": "$swishNumber",
+            "amount": "100",                // Manually set amount here
+            "currency": "SEK",
+            "message": "Payment for Order",  // Manually set message here
+            "callbackUrl": "https://holly-royal-teal.glitch.me/paymentcallback"
+        }
+    """.trimIndent()
+
+        val requestBody = jsonPayload.toRequestBody("application/json".toMediaType())
+        val request = Request.Builder()
+            .url("https://mss.cpc.getswish.net/swish-cpcapi/api/v1/paymentrequests") // Swish API URL for payment requests
+            .post(requestBody)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    Log.i("SwishPayment", "Payment request successful: ${response.body?.string()}")
+                } else {
+                    Log.e("SwishPayment", "Payment request failed with status ${response.code}: ${response.body?.string()}")
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("SwishPayment", "Payment request failed: ${e.message}", e)
+            }
+        })
+    }
+
+
+    @Composable
+    fun SwishScreen(context: Context, username: String) {
+        // Trigger the payment request when the screen is launched
+        LaunchedEffect(key1 = username) {
+            makeSwishPaymentRequest(context, username)
+        }
+    }
+
+
+
+
+
+
+
+    /*
+    fun sendSwishPaymentRequest(context: Context, swishNumber: String, eventName: String, location: String) {
+
+        val client = createSwishOkHttpClient(context)
+        val jsonPayload = """
+            {
+                "payeeAlias": "$swishNumber",
+                "amount": "100",
+                "currency": "SEK",
+                "message": "Payment for Order",
+                "callbackUrl": "https://holly-royal-teal.glitch.me/paymentcallback"
+            }
+        """.trimIndent()
+
+        // JSON data for the Swish API request, with dynamic Swish number and amount
+
+        val requestBody = jsonPayload.toRequestBody("application/json".toMediaType())
+        val request = Request.Builder()
+            .url("https://holly-royal-teal.glitch.me/paymentcallback") // Use your callback URL here for testing
+            .post(requestBody)
+            .build()
+
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    Log.i("SwishPayment", "Payment request successful: ${response.body?.string()}")
+                } else {
+                    Log.e("SwishPayment", "Payment request failed with status ${response.code}: ${response.body?.string()}")
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("SwishPayment", "Payment request failed: ${e.message}", e)
+            }
+        })
+    }
+
+    // Main function to make the Swish payment request by querying Firestore for Swish number and total price
+        fun makeSwishPaymentRequest(context: Context, username: String, eventName: String, location: String) {
+            val db = FirebaseFirestore.getInstance()
+
+            // Step 1: Retrieve user document to get the Swish number
+            db.collection("users")
+                .whereEqualTo("username", username)
+                .get()
+                .addOnSuccessListener { userDocuments ->
+                    if (userDocuments.isEmpty) {
+                        Log.e("SwishPayment", "User with username $username not found.")
+                        return@addOnSuccessListener
+                    }
+
+                    val userDoc = userDocuments.documents[0]
+                    val swishNumber = userDoc.getString("swishNumber")
+                    if (swishNumber.isNullOrEmpty()) {
+                        Log.e("SwishPayment", "Swish number is missing for user $username.")
+                        return@addOnSuccessListener
+                    }
+
+                    // Step 2: Find the event created by this user
+                    db.collection("events")
+                        .whereEqualTo("createdBy", username)
+                        .get()
+                        .addOnSuccessListener { eventDocuments ->
+                            if (eventDocuments.isEmpty) {
+                                Log.e("SwishPayment", "No event found for user $username.")
+                                return@addOnSuccessListener
+                            }
+
+                            val eventDoc = eventDocuments.documents[0]
+                            val eventId = eventDoc.id
+
+                            // Step 3: Retrieve the order associated with the event to get the total price
+                            db.collection("Orders")
+                                .whereEqualTo("eventName", eventName)
+                                .whereEqualTo("location", location)
+                                .get()
+                                .addOnSuccessListener { orderDocuments ->
+                                    if (orderDocuments.isEmpty) {
+                                        Log.e("SwishPayment", "No order found for event ID $eventId.")
+                                        return@addOnSuccessListener
+                                    }
+
+                                    val orderDoc = orderDocuments.documents[0]
+                                    val totalPrice = orderDoc.getDouble("totalPrice") ?: 0.0
+
+                                    // Proceed to create the Swish payment request with the retrieved data
+                                    sendSwishPaymentRequest(context, swishNumber, eventName, location)
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("SwishPayment", "Error retrieving order: ${e.message}", e)
+                                }
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("SwishPayment", "Error retrieving event: ${e.message}", e)
+                        }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("SwishPayment", "Error retrieving user: ${e.message}", e)
+                }
+        }
+    */
 
     /*fun createSwishOkHttpClient(context: Context): OkHttpClient {
        val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {

@@ -187,11 +187,19 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean, activity: 
         composable("macp") {
             MapsActivityCurrentPlaceScreen(navController = navController) //
         }
-
         composable("swish_screen") {
-            //SwishPage(navController = navController, context)
-            makeSwishPaymentRequest(context = context, username = userstore, eventName = nameofevent, location = chaneloc) //
+            // Assuming `userstore` contains the username
+            SwishScreen(context = context, username = userstore)
         }
+        /*composable("swish_screen") {
+            //SwishPage(navController = navController, context)
+            makeSwishPaymentRequest(context = context, username = userstore) //
+        }*/
+        /*composable("swish_screen/{username}") { backStackEntry ->
+            val username = backStackEntry.arguments?.getString("username") ?: ""
+            SwishScreen(context = context, username = username)
+        }*/
+
 
         // Google Registration page
         composable(
