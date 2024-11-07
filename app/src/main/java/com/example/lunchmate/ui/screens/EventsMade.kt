@@ -173,12 +173,6 @@ fun EventsMade(navController: NavController, creatorName: String) {
         }
     }
 }
-
-
-
-
-
-
 @Composable
 fun EventItem(event: Event, navController: NavController) {
     var remainingTime by remember { mutableStateOf("Loading...") }

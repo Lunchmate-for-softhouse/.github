@@ -48,6 +48,7 @@ import com.example.lunchmate.ui.screens.ViewOrder
 import com.example.lunchmate.ui.screens.chaneloc
 import com.example.lunchmate.ui.screens.eventcreator
 import com.example.lunchmate.ui.screens.nameofevent
+import com.examplelunchmate.ui.screens.SubmitReview
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -237,9 +238,9 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
         }
 
         // Add the ReviewPage composable
-       composable("reviews") {
-            Reviews(navController=navController,userstore) // Navigate back to the previous screen
-        }
+            composable("reviews") { Reviews(navController, userstore) }
+            composable("submit_review") { SubmitReview(navController, userstore) }
+
     }
 
     // Handle navigation to the review page after the nav host is set up
