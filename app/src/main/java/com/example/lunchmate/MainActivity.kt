@@ -38,13 +38,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.lunchmate.com.example.lunchmate.ui.screens.ViewOrder
+
 //import com.example.lunchmate.com.example.lunchmate.ui.screens.ReviewPage
 import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.EventDetails
 import com.example.lunchmate.ui.screens.EventPage
 import com.example.lunchmate.ui.screens.EventsMade
-import com.example.lunchmate.ui.screens.ReviewNotificationWorker
 import com.example.lunchmate.ui.screens.chaneloc
 import com.example.lunchmate.ui.screens.eventcreator
 import com.example.lunchmate.ui.screens.makeSwishPaymentRequest
@@ -139,32 +138,32 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // Function to schedule a notification after the order is confirmed
-    private fun scheduleReviewNotification() {
-        // Schedule the WorkManager notification with a 1-minute delay
-        val notificationWorkRequest: WorkRequest = OneTimeWorkRequestBuilder<ReviewNotificationWorker>()
-            .setInitialDelay(1, TimeUnit.MINUTES) // Delay of 1 minute
-            .build()
-
-        WorkManager.getInstance(this).enqueue(notificationWorkRequest)
-    }
-
-    // Call this function when the order is confirmed
-    fun confirmOrder() {
-        clearSelectedOrders()
-        scheduleReviewNotification()
-        finish()
-    }
-
-    private fun clearSelectedOrders() {
-        Toast.makeText(this, "Selected orders cleared.", Toast.LENGTH_SHORT).show()
-    }
+//    // Function to schedule a notification after the order is confirmed
+//    private fun scheduleReviewNotification() {
+//        // Schedule the WorkManager notification with a 1-minute delay
+//        val notificationWorkRequest: WorkRequest = OneTimeWorkRequestBuilder<ReviewNotificationWorker>()
+//            .setInitialDelay(1, TimeUnit.MINUTES) // Delay of 1 minute
+//            .build()
+//
+//        WorkManager.getInstance(this).enqueue(notificationWorkRequest)
+//    }
+//
+//    // Call this function when the order is confirmed
+//    fun confirmOrder() {
+//        clearSelectedOrders()
+//        scheduleReviewNotification()
+//        finish()
+//    }
+//
+//    private fun clearSelectedOrders() {
+//        Toast.makeText(this, "Selected orders cleared.", Toast.LENGTH_SHORT).show()
+//    }
 }
 
 // Composable navigation host for the app
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
+fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean, activity: MainActivity) {
     var userstore = ""
 
 
@@ -185,8 +184,9 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
             MapsActivityCurrentPlaceScreen(navController = navController) //
         }
         composable("swish_screen") {
+            SwishPage(navController = navController, context)
             // Assuming `userstore` contains the username
-            SwishScreen(context = context, username = userstore)
+            //SwishScreen(context = context, username = userstore)
         }
         /*composable("swish_screen") {
             //SwishPage(navController = navController, context)
