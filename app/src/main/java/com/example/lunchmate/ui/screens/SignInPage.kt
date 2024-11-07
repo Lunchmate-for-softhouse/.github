@@ -1,5 +1,4 @@
 package com.example.lunchmate.ui.screens
-
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,6 +13,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.firestore.FirebaseFirestore
+var chaneloc = ""
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,6 +88,12 @@ fun SignInPage(navController: NavController) {
                                     Log.d("SignInPage", "Documents fetched: ${documents.size()}")
 
                                     if (!documents.isEmpty) {
+                                        // Retrieve the location from the first document
+                                        val userDoc = documents.firstOrNull()
+                                         chaneloc = userDoc?.getString("location") ?: "Unknown Location"
+
+                                        Log.d("SignInPage", "User location: $chaneloc")
+
                                         loginStatus = "Login Successful!"
                                         // Navigate to MainPage with the username
                                         navController.navigate("main_page/$username")
@@ -95,9 +101,9 @@ fun SignInPage(navController: NavController) {
                                         loginStatus = "Login Failed! Invalid credentials."
                                     }
                                 }
-                                .addOnFailureListener { exception ->
-                                    Log.e("SignInPage", "Error accessing database: ${exception.message}")
-                                    loginStatus = "Error accessing database."
+                                .addOnFailureListener { e ->
+                                    Log.e("SignInPage", "Error fetching documents", e)
+                                    loginStatus = "Login Failed! Please try again."
                                 }
                         }
                     },

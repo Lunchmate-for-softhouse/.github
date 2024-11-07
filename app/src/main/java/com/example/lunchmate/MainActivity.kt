@@ -18,16 +18,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.WorkRequest
 import com.example.lunchmate.ui.screens.HomePage
 import com.example.lunchmate.ui.screens.RegisterPage
 import com.example.lunchmate.ui.screens.SignInPage
 import com.example.lunchmate.ui.theme.LunchMateTheme
 import com.google.firebase.FirebaseApp
-//import com.example.lunchmate.ui.screens.EventPage // Import the EventPage
-import java.util.concurrent.TimeUnit
+import com.example.lunchmate.ui.screens.EventPage // Import the EventPage
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.ActivityResultLauncher
@@ -36,23 +32,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-
-//import com.example.lunchmate.com.example.lunchmate.ui.screens.ReviewPage
 import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.EventDetails
-import com.example.lunchmate.ui.screens.EventPage
 import com.example.lunchmate.ui.screens.EventsMade
-
-
+import com.example.lunchmate.ui.screens.Reviews
 import com.example.lunchmate.ui.screens.ViewOrder
-
+import com.example.lunchmate.ui.screens.chaneloc
 import com.example.lunchmate.ui.screens.eventcreator
 import com.example.lunchmate.ui.screens.nameofevent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-var chaneloc =""
 var event= ""
 
 
@@ -126,29 +117,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-/*
-    // Function to schedule a notification after the order is confirmed
-    private fun scheduleReviewNotification() {
-        // Schedule the WorkManager notification with a 1-minute delay
-        val notificationWorkRequest: WorkRequest = OneTimeWorkRequestBuilder<ReviewNotificationWorker>()
-            .setInitialDelay(1, TimeUnit.MINUTES) // Delay of 1 minute
-            .build()
 
-        WorkManager.getInstance(this).enqueue(notificationWorkRequest)
-    }
-
-    // Call this function when the order is confirmed
-    fun confirmOrder() {
-        clearSelectedOrders()
-        scheduleReviewNotification()
-        finish()
-    }
-
-    private fun clearSelectedOrders() {
-        Toast.makeText(this, "Selected orders cleared.", Toast.LENGTH_SHORT).show()
-    }
-}
-*/
 // Composable navigation host for the app
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -238,9 +207,9 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
         }
 
         // Add the ReviewPage composable
-//        composable("review_pag") {
-//            ReviewPage(onBack = { navController.popBackStack() }) // Navigate back to the previous screen
-//        }
+       composable("reviews") {
+            Reviews(navController = navController, userstore) // Navigate back to the previous screen
+       }
     }
 
     // Handle navigation to the review page after the nav host is set up
