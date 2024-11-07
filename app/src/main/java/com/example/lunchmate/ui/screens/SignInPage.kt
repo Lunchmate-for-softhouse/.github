@@ -79,21 +79,29 @@ fun SignInPage(navController: NavController) {
                         if (username.isEmpty() || password.isEmpty()) {
                             loginStatus = "Please enter both username and password."
                         } else {
-                            // Query Firestore
+                            // Query Firestore for all users
                             db.collection("users")
-                                .whereEqualTo("username", username)
-                                .whereEqualTo("password", password)
                                 .get()
                                 .addOnSuccessListener { documents ->
                                     Log.d("SignInPage", "Documents fetched: ${documents.size()}")
 
-                                    if (!documents.isEmpty) {
-                                        // Retrieve the location from the first document
-                                        val userDoc = documents.firstOrNull()
-                                         chaneloc = userDoc?.getString("location") ?: "Unknown Location"
+                                    var userFound = false
+                                    var storedPassword: String? = null
 
-                                        Log.d("SignInPage", "User location: $chaneloc")
+                                    for (document in documents) {
+                                        val storedUsername = document.getString("username")?.lowercase()
+                                        storedPassword = document.getString("password")
 
+                                        // Case-insensitive username comparison
+                                        if (username.lowercase() == storedUsername) {
+                                            userFound = true
+                                            chaneloc = document.getString("location") ?: "Unknown Location" // Update location
+                                            Log.d("SignInPage", "User location: $chaneloc")
+                                            break
+                                        }
+                                    }
+
+                                    if (userFound && password.lowercase() == storedPassword?.lowercase()) {
                                         loginStatus = "Login Successful!"
                                         // Navigate to MainPage with the username
                                         navController.navigate("main_page/$username")
