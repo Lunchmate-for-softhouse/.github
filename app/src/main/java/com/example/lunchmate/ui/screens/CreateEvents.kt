@@ -241,7 +241,9 @@ fun CreateEvents(navController: NavController, Location: String, userName: Strin
                                 pickupDineIn = pickupDineIn,
                                 location = location,
                                 isEventEnded = false,
-                                etaStart = false
+                                etaStart = false,
+                                people = 0,
+                                estimatedArrivalTime = ""
                             )
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar("Event created successfully!")

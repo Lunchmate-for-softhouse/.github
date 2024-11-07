@@ -28,7 +28,7 @@ import java.util.*
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.ui.text.font.FontWeight
-import com.example.lunchmate.chaneloc
+
 
 var nameofevent= ""
 val etaOptions = (1..15).map { i -> String.format("%02d:%02d", i / 6, (i % 6) * 10) } // Generate times from 00:10 to 02:30
@@ -37,7 +37,7 @@ fun EventsMade(navController: NavController, creatorName: String) {
     val eventsList = remember { mutableStateListOf<Event>() }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
-    var selectedLocation by remember { mutableStateOf("Stockholm") } // Default selected location
+    var selectedLocation by remember { mutableStateOf(chaneloc) } // Default selected location
     val eventManager = EventManager() // Instantiate EventManager
 
     // Debugging: Log when events are fetched
@@ -192,7 +192,7 @@ fun EventItem(event: Event, navController: NavController) {
     val etaStart by remember { mutableStateOf(event.etaStart) }
 
     LaunchedEffect(eventDateTime) {
-        while (!event.isEventEnded) {
+        while (event.estimatedArrivalTime.isEmpty()) {
             try {
                 val eventTimeParsed = dateFormat.parse(eventDateTime) ?: Date()
                 val currentTime = Date()
@@ -216,7 +216,7 @@ fun EventItem(event: Event, navController: NavController) {
     }
 
     // Launch ETA countdown logic if etaStart is true
-    if (event.etaStart) {
+    if (event.estimatedArrivalTime.isNotEmpty()) {
         LaunchedEffect(event) {
             try {
                 val estimatedTimeString = event.estimatedArrivalTime
@@ -252,8 +252,8 @@ fun EventItem(event: Event, navController: NavController) {
     }
 
     // Determine the label for remaining time or ETA display
-    val timeDisplayLabel = if (event.etaStart) "Estimated Time of Arrival" else "Time Left"
-    val timeDisplay = if (event.etaStart) etaLeft else remainingTime
+    val timeDisplayLabel = if (event.estimatedArrivalTime.isNotEmpty()) "Estimated Time of Arrival" else "Time Left"
+    val timeDisplay = if (event.estimatedArrivalTime.isNotEmpty()) etaLeft else remainingTime
 
     Card(
         modifier = Modifier
@@ -285,7 +285,7 @@ fun EventItem(event: Event, navController: NavController) {
                     onClick = {
                         if (event.etaStart) {
                             nameofevent = event.eventName
-                            navController.navigate("Reviews")
+                            navController.navigate("reviews")
                         } else {
                             // Handle Menu action
                         }
@@ -317,7 +317,7 @@ fun EventItem(event: Event, navController: NavController) {
                 Text("Created by: ${event.createdBy}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
             }
             Text(event.pickupDineIn, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
-            Text("People: ${event.peopleCount}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
+            Text("Particpants: ${event.people}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
 
             Text("$timeDisplayLabel: $timeDisplay", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
 
@@ -394,8 +394,6 @@ fun EventCreatorItem(event: Event, navController: NavController, onDeleteConfirm
     var isPickup by remember { mutableStateOf(event.pickupDineIn == "Pickup") }
     var pickupDineInOption by remember { mutableStateOf(event.pickupDineIn) }
     var showEtaInput by remember { mutableStateOf(false) }
-    var estimatedArrivalTime by remember { mutableStateOf(event.estimatedArrivalTime) }
-    var startEtaCountdown by remember { mutableStateOf(false) }
     var etaCompleted by remember { mutableStateOf(false) }
     var isEventEnded by remember { mutableStateOf(event.isEventEnded) }
     var etaStart by remember { mutableStateOf(event.etaStart) }
@@ -406,10 +404,11 @@ fun EventCreatorItem(event: Event, navController: NavController, onDeleteConfirm
     val eventDateTime = "$eventDate $eventTime"
     val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
     val eventManager = EventManager()
+    val estimatedTimeString = event.estimatedArrivalTime
 
     // Timer logic to update remaining time and isEventEnded status
     LaunchedEffect(eventDateTime) {
-        while (!event.isEventEnded or !isEventEnded) {
+        while (estimatedTimeString.isEmpty()) {
             try {
                 val eventTimeParsed = dateFormat.parse(eventDateTime) ?: Date()
                 val currentTime = Date()
@@ -440,7 +439,7 @@ fun EventCreatorItem(event: Event, navController: NavController, onDeleteConfirm
         }
     }
 
-    if (event.etaStart || etaStart) {
+    if (event.estimatedArrivalTime.isNotEmpty() || etaStart) {
         LaunchedEffect(event) {
             try {
                 val estimatedTimeString = event.estimatedArrivalTime
@@ -474,8 +473,8 @@ fun EventCreatorItem(event: Event, navController: NavController, onDeleteConfirm
         }
     }
 
-    val timeDisplayLabel = if (etaStart) "Estimated Time of Arrival" else "Time Left"
-    val timeDisplay = if (etaStart) remainingTimeEta else remainingTime
+    val timeDisplayLabel = if (event.estimatedArrivalTime.isEmpty()) "Time Left" else "Estimated Time of Arrival"
+    val timeDisplay = if (event.estimatedArrivalTime.isEmpty()) remainingTime  else remainingTimeEta
 
     Card(
         modifier = Modifier
@@ -559,7 +558,7 @@ fun EventCreatorItem(event: Event, navController: NavController, onDeleteConfirm
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(imageVector = Icons.Filled.Person, contentDescription = "People Count")
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("People: ${event.peopleCount}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
+                    Text("Particpants: ${event.people}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
                 }
                 Text("Option: ${if (pickupDineInOption == "Pickup") "Pickup" else "Dine In"}", style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp))
             }
@@ -598,7 +597,7 @@ fun EventCreatorItem(event: Event, navController: NavController, onDeleteConfirm
                                         if (!success) {
                                             Log.e("EventCreatorItem", "Failed to update ETA and etaStart in database")
                                         } else {
-                                            etaStart = event.etaStart
+                                            etaStart = !etaStart
                                         }
                                     }
                                 }
@@ -661,12 +660,25 @@ fun EventCreatorItem(event: Event, navController: NavController, onDeleteConfirm
                     Text(if (isEditing) "Save" else "Edit")
                 }
                 Button(
-                    onClick = onDeleteConfirmed,
+                    onClick = {
+                        eventManager.deleteEvent(event.createdBy, event.eventName) { success ->
+                            if (success) {
+                                navController.navigate("current_events")
+                                // Perform actions if the deletion was successful, e.g., show confirmation
+                                Log.d("Event", "Event deleted successfully.")
+                                // You could also navigate back or update the UI here
+                            } else {
+                                // Handle the failure, e.g., show an error message
+                                Log.e("Event", "Failed to delete the event.")
+                            }
+                        }
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     enabled = !event.etaStart
                 ) {
                     Text("Delete")
                 }
+
             }
         }
     }
@@ -685,11 +697,11 @@ data class Event(
     val location: String = "",
     val pickupDineIn: String = "",
     val createdBy: String = "",
-    val peopleCount: Int = 0,
     val eventDescription: String = "",
     val estimatedArrivalTime: String = "", // Add this line
     val isEventEnded: Boolean = false ,
-    val etaStart: Boolean = false
+    val etaStart: Boolean = false,
+    val people: Int = 0,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

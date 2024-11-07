@@ -11,7 +11,9 @@ fun saveEvent(
         pickupDineIn: String,
         location: String,
         isEventEnded: Boolean,
-        etaStart: Boolean
+        etaStart: Boolean,
+        people: Int,
+        estimatedArrivalTime: String
 ) {
         val db = FirebaseFirestore.getInstance()
 
@@ -25,7 +27,9 @@ fun saveEvent(
             "pickupDineIn" to pickupDineIn,
             "location" to location,
             "isEventEnded" to isEventEnded,
-            "etaStart" to etaStart
+            "etaStart" to etaStart,
+            "people" to people,
+            "estimatedArrivalTime" to estimatedArrivalTime
         )
 
         // Add event to Firestore
