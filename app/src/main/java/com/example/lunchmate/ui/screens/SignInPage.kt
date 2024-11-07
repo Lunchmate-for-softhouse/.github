@@ -79,13 +79,12 @@ fun SignInPage(navController: NavController) {
                         if (username.isEmpty() || password.isEmpty()) {
                             loginStatus = "Please enter both username and password."
                         } else {
-                            // Query Firestore
+                            // Query Firestore for all users
                             db.collection("users")
-                                .whereEqualTo("username", username)
-                                .whereEqualTo("password", password)
                                 .get()
                                 .addOnSuccessListener { documents ->
                                     Log.d("SignInPage", "Documents fetched: ${documents.size()}")
+
 
                                     if (!documents.isEmpty) {
                                         // Retrieve the location from the first document
@@ -93,6 +92,23 @@ fun SignInPage(navController: NavController) {
                                          chaneloc = userDoc?.getString("location") ?: "Unknown Location"
 
                                         Log.d("SignInPage", "User location: $chaneloc")
+
+
+                                    var userFound = false
+                                    var storedPassword: String? = null
+
+                                    for (document in documents) {
+                                        val storedUsername = document.getString("username")?.lowercase()
+                                        storedPassword = document.getString("password")
+
+                                        // Case-insensitive username comparison
+                                        if (username.lowercase() == storedUsername) {
+                                            userFound = true
+                                            break
+                                        }
+                                    }
+
+                                    if (userFound && password.lowercase() == storedPassword?.lowercase()) {
 
                                         loginStatus = "Login Successful!"
                                         // Navigate to MainPage with the username
