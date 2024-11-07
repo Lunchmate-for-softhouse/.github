@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 // Order data class
@@ -234,8 +235,8 @@ fun EventPage(navController: NavController, eventName: String, location: String,
                     if (orders.isEmpty()) {
                         showErrorDialog = true
                     } else {
-                        saveOrdersToDatabase(db, orders) {
-                            navController.navigate("current_orders")
+                        saveOrdersToDatabase(db, orders, eventName, location) {
+                            navController.navigate("current_events")
                         }
                     }
                 },
@@ -264,22 +265,50 @@ fun EventPage(navController: NavController, eventName: String, location: String,
     }
 }
 
-// Function to save orders to Firestore
-fun saveOrdersToDatabase(db: FirebaseFirestore, orders: List<Order>, onComplete: () -> Unit) {
+// Function to save orders to Firestore and increment 'people' count for the event
+fun saveOrdersToDatabase(
+    db: FirebaseFirestore,
+    orders: List<Order>,
+    eventName: String,
+    location: String,
+    onComplete: () -> Unit
+) {
     val batch = db.batch()
-    val collectionRef = db.collection("Orders")
+    val ordersCollectionRef = db.collection("Orders")
+    val eventsCollectionRef = db.collection("events")  // Replace with your actual events collection name
 
+    // Save each order in the Orders collection
     for (order in orders) {
-        val newOrderRef = collectionRef.document()
+        val newOrderRef = ordersCollectionRef.document()
         batch.set(newOrderRef, order)
     }
 
-    batch.commit().addOnCompleteListener {
-        if (it.isSuccessful) {
-            Log.d("Firestore", "Orders successfully written!")
-            onComplete()
-        } else {
-            Log.w("Firestore", "Error writing orders", it.exception)
+    // Query to find the specific event document matching eventName and location
+    eventsCollectionRef
+        .whereEqualTo("eventName", eventName)
+        .whereEqualTo("location", location)
+        .get()
+        .addOnSuccessListener { querySnapshot ->
+            if (!querySnapshot.isEmpty) {
+                // Assume there is only one document matching the eventName and location
+                val eventDocRef = querySnapshot.documents[0].reference
+                // Increment 'people' count by 1
+                batch.update(eventDocRef, "people", FieldValue.increment(1))
+
+                // Commit the batch with both the new orders and people count increment
+                batch.commit().addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        Log.d("Firestore", "Orders and people count successfully updated!")
+                        onComplete()
+                    } else {
+                        Log.w("Firestore", "Error updating orders or people count", it.exception)
+                    }
+                }
+            } else {
+                Log.w("Firestore", "No matching event found for incrementing people count.")
+            }
         }
-    }
+        .addOnFailureListener { e ->
+            Log.e("Firestore", "Error finding event document", e)
+        }
 }
