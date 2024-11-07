@@ -36,7 +36,7 @@ val etaOptions = (1..15).map { i -> String.format("%02d:%02d", i / 6, (i % 6) * 
 @Composable
 fun EventsMade(navController: NavController, creatorName: String) {
     val eventsList = remember { mutableStateListOf<Event>() }
-    var isLoading by remember { mutableStateOf(true) }
+    var isLoading by remember { mutableStateOf(true)  }
     var errorMessage by remember { mutableStateOf("") }
     var selectedLocation by remember { mutableStateOf(chaneloc) } // Default selected location
     val eventManager = EventManager() // Instantiate EventManager

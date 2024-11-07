@@ -10,7 +10,7 @@ import androidx.navigation.NavController
 
 @Composable
 fun EventDetails(navController: NavController, eventName: String, userId: String) {
-    var showDialog by remember { mutableStateOf(true) }
+    var showDialog by remember { mutableStateOf(true)  }
 
     if (showDialog) {
         AlertDialog(

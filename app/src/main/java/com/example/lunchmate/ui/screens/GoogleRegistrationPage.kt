@@ -48,7 +48,7 @@ fun GoogleRegisterPage(navController: NavController, username: String) {
         )
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Pre-filled Username from Google Account
+        // Pre filled Username from Google Account
         Text(text = "Username: $username", color = Color.White)
 
         Spacer(modifier = Modifier.height(20.dp))

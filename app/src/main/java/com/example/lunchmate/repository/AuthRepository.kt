@@ -43,7 +43,7 @@ class AuthRepository(private val activity: Activity) {
                     FirebaseFirestore.getInstance().collection("users").document(userId)
                         .get()
                         .addOnSuccessListener { document ->
-                            if (document.exists()) {
+                            if (document.exists())  {
                                 onUserExists()
                                 chaneloc = document.getString("location") ?: "Unknown Location" // Update location
                                 Log.d("SignInPage", "User location: $chaneloc")

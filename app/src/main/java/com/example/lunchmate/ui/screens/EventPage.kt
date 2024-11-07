@@ -42,7 +42,7 @@ fun EventPage(navController: NavController, eventName: String, location: String,
     var mealName by remember { mutableStateOf("") }
     var mealPrice by remember { mutableStateOf("") }
     var drinkName by remember { mutableStateOf("") }
-    var drinkPrice by remember { mutableStateOf("") }
+    var drinkPrice by remember { mutableStateOf("")  }
     var orders by remember { mutableStateOf(listOf<Order>()) }
     var showErrorDialog by remember { mutableStateOf(false) }
     val db = FirebaseFirestore.getInstance()

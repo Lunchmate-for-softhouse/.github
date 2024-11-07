@@ -147,7 +147,7 @@ fun RegisterPage(navController: NavController) {
                 }
             },
             title = { Text("Registration Successful") },
-            text = { Text("You have registered successfully!") }
+            text = { Text("You have registered successfully!")  }
         )
     }
 }

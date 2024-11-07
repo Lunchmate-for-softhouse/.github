@@ -150,7 +150,7 @@ fun SignInPage(navController: NavController, activity: Activity) {
 
                 Button(
                     onClick = {
-                        if (username.isEmpty() || password.isEmpty()) {
+                        if (username.isEmpty() || password.isEmpty())  {
                             loginStatus = "Please enter both username and password."
                         } else {
                             // Query Firestore for all users
