@@ -42,6 +42,7 @@ import com.example.lunchmate.ui.screens.CreateEvents
 import com.example.lunchmate.ui.screens.EventDetails
 import com.example.lunchmate.ui.screens.EventPage
 import com.example.lunchmate.ui.screens.EventsMade
+import com.example.lunchmate.ui.screens.Reviews
 //import com.example.lunchmate.ui.screens.ReviewNotificationWorker
 import com.example.lunchmate.ui.screens.ViewOrder
 import com.example.lunchmate.ui.screens.chaneloc
@@ -171,6 +172,9 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
         composable("macp") {
             MapsActivityCurrentPlaceScreen(navController = navController) //
         }
+        composable("restaurant_list") {
+            RestList(navController = navController)
+        }
 
         composable(
             route = "main_page/{username}",
@@ -233,9 +237,9 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean) {
         }
 
         // Add the ReviewPage composable
-//        composable("review_pag") {
-//            ReviewPage(onBack = { navController.popBackStack() }) // Navigate back to the previous screen
-//        }
+       composable("reviews") {
+            Reviews(navController=navController,userstore) // Navigate back to the previous screen
+        }
     }
 
     // Handle navigation to the review page after the nav host is set up
