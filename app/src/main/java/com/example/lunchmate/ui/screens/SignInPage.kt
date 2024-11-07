@@ -64,6 +64,37 @@ fun SignInPage(navController: NavController, activity: Activity) {
         }
     }
 
+
+    /*val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        scope.launch {
+            try {
+                val account: GoogleSignInAccount? = task.getResult(Exception::class.java)
+                account?.let {
+                    authRepository.firebaseAuthWithGoogle(
+                        account = it,
+                        onUserExists = {
+                            loginStatus = "Welcome back, ${account.displayName}!"
+                            navController.navigate("main_page/${account.displayName}")
+                        },
+                        onUserDoesNotExist = { newAccount ->
+                            navController.navigate("google_registration_page/${newAccount.displayName}")
+                        },
+                        onFailure = { exception ->
+                            loginStatus = "Google Sign-In Failed: ${exception.message}"
+                        }
+                    )
+                } ?: run {
+                    loginStatus = "Google Sign-In Failed!"
+                }
+            } catch (e: Exception) {
+                loginStatus = "Google Sign-In Error: ${e.message}"
+            }
+        }
+    }*/
+
     Box(
         modifier = Modifier
             .fillMaxSize()

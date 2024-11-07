@@ -37,6 +37,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 //import com.example.lunchmate.ui.screens.eventNamer
 import androidx.navigation.NavHostController
+import com.example.lunchmate.R
 
 //var userselectedresturant= ""
 
