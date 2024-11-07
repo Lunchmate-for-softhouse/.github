@@ -85,15 +85,6 @@ fun SignInPage(navController: NavController) {
                                 .addOnSuccessListener { documents ->
                                     Log.d("SignInPage", "Documents fetched: ${documents.size()}")
 
-
-                                    if (!documents.isEmpty) {
-                                        // Retrieve the location from the first document
-                                        val userDoc = documents.firstOrNull()
-                                         chaneloc = userDoc?.getString("location") ?: "Unknown Location"
-
-                                        Log.d("SignInPage", "User location: $chaneloc")
-
-
                                     var userFound = false
                                     var storedPassword: String? = null
 
@@ -104,12 +95,13 @@ fun SignInPage(navController: NavController) {
                                         // Case-insensitive username comparison
                                         if (username.lowercase() == storedUsername) {
                                             userFound = true
+                                            chaneloc = document.getString("location") ?: "Unknown Location" // Update location
+                                            Log.d("SignInPage", "User location: $chaneloc")
                                             break
                                         }
                                     }
 
                                     if (userFound && password.lowercase() == storedPassword?.lowercase()) {
-
                                         loginStatus = "Login Successful!"
                                         // Navigate to MainPage with the username
                                         navController.navigate("main_page/$username")
