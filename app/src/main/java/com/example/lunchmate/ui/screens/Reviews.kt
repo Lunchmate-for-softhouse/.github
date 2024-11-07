@@ -27,7 +27,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.wear.compose.material.Colors
+//import androidx.wear.compose.material.Colors
 import coil.compose.rememberAsyncImagePainter
 import com.example.lunchmate.Restaurant
 import com.example.lunchmate.saveReviews
