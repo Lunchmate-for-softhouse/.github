@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
@@ -178,8 +179,26 @@ fun SignInPage(navController: NavController, activity: Activity) {
                 ) {
                     Text(text = "Sign In")
                 }
+                // Function to sign out and force account selection
+                fun signOutAndPromptAccountSelection() {
+                    val googleSignInClient = GoogleSignIn.getClient(activity, GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    googleSignInClient.signOut().addOnCompleteListener {
+                        // Once signed out, proceed to trigger the login flow
+                        val signInIntent = authRepository.getGoogleSignInIntent()  // Using your auth repository to get sign-in intent
+                        googleSignInLauncher.launch(signInIntent) // Start the sign-in flow
+                    }
+                }
 
-                // Google Sign-In Button
+                Button(
+                    onClick = {
+                        signOutAndPromptAccountSelection() // Call the function when the button is clicked
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Sign In with Google")
+                }
+
+                /*// Google Sign-In Button
                 Button(
                     onClick = {
                         val signInIntent = authRepository.getGoogleSignInIntent()
@@ -188,7 +207,7 @@ fun SignInPage(navController: NavController, activity: Activity) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "Sign In with Google")
-                }
+                }*/
 
                 Text(
                     text = loginStatus,
