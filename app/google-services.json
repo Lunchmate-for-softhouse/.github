@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "401196002201",
+    "firebase_url": "https://luchmate-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "luchmate",
+    "storage_bucket": "luchmate.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:401196002201:android:492e68707961615ffbc108",
+        "android_client_info": {
+          "package_name": "com.example.lunchmate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "401196002201-1arrg9v3151sc4096jc8kframu91mf0d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.lunchmate",
+            "certificate_hash": "5b42e0eb8f2d3f278ca21901e0ccb60a837c1bec"
+          }
+        },
+        {
+          "client_id": "401196002201-4pmd449n9sm50m1k9cccpmda4p9fmn11.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAB-h7hng6HsPXvn8nQf9kg-FPsOKHV7y0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "401196002201-4pmd449n9sm50m1k9cccpmda4p9fmn11.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
