@@ -38,22 +38,10 @@ import androidx.navigation.compose.rememberNavController
 
 import androidx.navigation.NavHostController
 
-//var userselectedresturant= ""
-
-
-/*class MapsActivityCurrentPlace : ComponentActivity(navController = navController) {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            MapsScreen()
-        }
-    }
-}*/
 @Composable
 fun MapsActivityCurrentPlaceScreen(navController: NavController) {
     // This is the entry point of the MapsActivityCurrentPlace content
     MapsScreen(navController)
-
 }
 
 @Composable
@@ -95,13 +83,6 @@ fun MapsScreen(navController: NavController) {
                 Text("View Restaurant List")
             }
         }
-        //Spacer(modifier = Modifier.height(16.dp))
-
-       // Button(onClick = { openRestaurantList() }) {
-         //   Text("Open Restaurant List")
-      //  }
-
-
 
         // Show dialog if selectedRestaurantName is not null
         if (showDialog && selectedRestaurantName != null) {
@@ -114,17 +95,12 @@ fun MapsScreen(navController: NavController) {
                         Text(text = selectedRestaurantName!!, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(onClick = {
-                            //eventNamer= userselectedresturant
-                            //navController.navigate("create_event")
                             navController.navigate("create_event/${selectedRestaurantName}")
                             showDialog = false
                         }) {
                             Text("Create")
                         }
                     }
-
-
-
                 },
                 confirmButton = {},
                 dismissButton = {}
@@ -192,11 +168,7 @@ private fun setupMap(googleMap: GoogleMap, context: Context, navController: NavC
         // Search for nearby restaurants and add them as markers
         searchNearbyRestaurants(it, googleMap, customMarker, onMarkerClick)
     }
-
-
-
 }
-
 
 private fun drawCircle(map: GoogleMap, location: LatLng, radius: Int) {
     map.addCircle(
@@ -208,7 +180,6 @@ private fun drawCircle(map: GoogleMap, location: LatLng, radius: Int) {
             .strokeWidth(2f)
     )
 }
-
 private fun searchNearbyRestaurants(location: LatLng, map: GoogleMap, customMarker: BitmapDescriptor, onMarkerClick: (String) -> Unit) {
     val radius = 1000
     val type = "restaurant"
@@ -241,7 +212,6 @@ private fun searchNearbyRestaurants(location: LatLng, map: GoogleMap, customMark
                                 .icon(customMarker)
                         )
                     }
-
                     // Set the OnMarkerClickListener
                     map.setOnMarkerClickListener { marker ->
                         // Get the restaurant name from the marker title
@@ -257,36 +227,10 @@ private fun searchNearbyRestaurants(location: LatLng, map: GoogleMap, customMark
     }
 }
 
-/*@Composable
-fun showRestaurantCardDialog(restaurantName: String, navController: NavController) {
-    var showDialog by remember { mutableStateOf(true) }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text("Restaurant Selected") },
-            text = {
-                Column {
-                    Text(text = restaurantName, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = {
-                        navController.navigate("create_event/$restaurantName")
-                        showDialog = false
-                    }) {
-                        Text("Create")
-                    }
-                }
-            },
-            confirmButton = {},
-            dismissButton = {}
-        )
-    }
-}
-*/
-
-
+/*
 private fun openRestaurantList() {
     // Implement the logic to open the restaurant list activity
 }
+ */
 
 private const val DEFAULT_ZOOM = 15
