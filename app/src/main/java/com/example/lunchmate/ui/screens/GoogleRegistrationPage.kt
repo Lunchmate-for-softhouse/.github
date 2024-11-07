@@ -19,6 +19,7 @@ import com.example.lunchmate.ui.components.CustomTextField
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
 import android.util.Log
+import com.example.lunchmate.ui.screens.chaneloc
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,6 +84,7 @@ fun GoogleRegisterPage(navController: NavController, username: String) {
                     DropdownMenuItem(
                         text = { Text(location) },
                         onClick = {
+                            chaneloc = location
                             selectedLocation = location
                             expanded = false
                         }
