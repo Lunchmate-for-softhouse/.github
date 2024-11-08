@@ -94,6 +94,7 @@ fun SubmitReview(navController: NavController, userName: String) {
                 }
             )
         },
+
         content = { paddingValues ->
             Box(
                 modifier = Modifier
