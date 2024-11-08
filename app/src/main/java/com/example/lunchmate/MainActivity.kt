@@ -183,6 +183,11 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean, activity: 
         composable("macp") {
             MapsActivityCurrentPlaceScreen(navController = navController) //
         }
+
+        composable("restaurant_list") {
+            RestList(navController = navController) //
+        }
+
         composable("swish_screen") {
             SwishPage(navController = navController, context)
             // Assuming `userstore` contains the username
