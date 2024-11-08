@@ -1,5 +1,4 @@
 package com.example.lunchmate
-
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -40,7 +39,6 @@ fun MapsScreen(navController: NavController) {
     val context = LocalContext.current
     val mapView = rememberMapViewWithLifecycle(context)
 
-    var test = false
 
     // State to control the dialog
     var selectedRestaurantName by remember { mutableStateOf<String?>(null) }
