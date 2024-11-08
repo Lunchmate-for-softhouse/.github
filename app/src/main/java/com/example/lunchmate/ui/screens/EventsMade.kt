@@ -1,6 +1,7 @@
 package com.example.lunchmate.ui.screens
 
 import BottomNavBar
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +29,15 @@ import java.util.*
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.ui.text.font.FontWeight
+import androidx.core.content.ContextCompat.startActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONObject
+import android.net.Uri
 
 
 var nameofevent= ""
@@ -288,7 +298,29 @@ fun EventItem(event: Event, navController: NavController) {
                             nameofevent = event.eventName
                             navController.navigate("reviews")
                         } else {
-                            // Handle Menu action
+                            /* Handle Menu action
+                            searchRestaurantByNameAndLocation(event.eventName, event.location)
+                            { websiteUrl -> if (websiteUrl != null)
+                            { println("Website URL: $websiteUrl") } else { println("No website URL found") } }
+
+                             */
+                            searchRestaurantByNameAndLocation(event.eventName, event.location) { websiteUrl ->
+                                if (websiteUrl != null) {
+                                    val context = navController.context
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(websiteUrl)).apply {
+                                        flags = Intent.FLAG_ACTIVITY_NEW_TASK // Ensure proper flags are set
+                                    }
+                                    context.startActivity(intent) // Use context to start the activity
+                                } else {
+                                    println("No website URL found")
+                                }
+                            }
+
+
+
+
+
+
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50), contentColor = Color.White)
@@ -717,5 +749,67 @@ data class Event(
 
     override fun hashCode(): Int {
         return Objects.hash(eventName, eventDate, eventTime, createdBy)
+    }
+}
+////////////////////////
+
+private fun searchRestaurantByNameAndLocation(eventName: String, location: String, onResult: (String?) -> Unit) {
+    val apiKey = "AIzaSyBywwGx414Zvd7GIoP7TKh8BTN8DPYpt08"
+    val url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=$eventName+in+$location&type=restaurant&key=$apiKey"
+
+
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val client = OkHttpClient()
+            val request = Request.Builder().url(url).build()
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    Log.e("API Error", "Failed to search restaurant: ${response.code}")
+                    return@use
+                }
+
+                val jsonResponse = response.body!!.string()
+                val results = JSONObject(jsonResponse).getJSONArray("results")
+
+                if (results.length() > 0) {
+                    val place = results.getJSONObject(0)
+                    val placeId = place.getString("place_id")
+                    getRestaurantWebsiteUrl(placeId, apiKey, onResult)
+                } else {
+                    withContext(Dispatchers.Main) {
+                        onResult(null) // No results found
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("API Error", "Error searching restaurant", e)
+        }
+    }
+}
+
+private fun getRestaurantWebsiteUrl(placeId: String, apiKey: String, onResult: (String?) -> Unit) {
+    val url = "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&fields=website&key=$apiKey"
+
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val client = OkHttpClient()
+            val request = Request.Builder().url(url).build()
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    Log.e("API Error", "Failed to fetch place details: ${response.code}")
+                    return@use
+                }
+
+                val jsonResponse = response.body!!.string()
+                val result = JSONObject(jsonResponse).optJSONObject("result")
+                val websiteUrl = result?.optString("website")
+
+                withContext(Dispatchers.Main) {
+                    onResult(websiteUrl)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("API Error", "Error fetching place details", e)
+        }
     }
 }
