@@ -1,5 +1,4 @@
 package com.example.lunchmate.ui.screens
-
 import BottomNavBar
 import android.util.Log
 import androidx.compose.foundation.background
@@ -31,7 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 
 
 var nameofevent= ""
-var Originalcreator = ""
 val etaOptions = (1..15).map { i -> String.format("%02d:%02d", i / 6, (i % 6) * 10) } // Generate times from 00:10 to 02:30
 @Composable
 fun EventsMade(navController: NavController, creatorName: String) {
@@ -174,12 +172,6 @@ fun EventsMade(navController: NavController, creatorName: String) {
         }
     }
 }
-
-
-
-
-
-
 @Composable
 fun EventItem(event: Event, navController: NavController) {
     var remainingTime by remember { mutableStateOf("Loading...") }
@@ -331,7 +323,6 @@ fun EventItem(event: Event, navController: NavController) {
                 Button(
                     onClick = {
                         nameofevent = event.eventName
-                        Originalcreator = event.createdBy
                         navController.navigate("event_page")
                     },
                     colors = ButtonDefaults.buttonColors(
@@ -718,4 +709,5 @@ data class Event(
     override fun hashCode(): Int {
         return Objects.hash(eventName, eventDate, eventTime, createdBy)
     }
+
 }
