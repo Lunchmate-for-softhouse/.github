@@ -3,6 +3,7 @@ import android.content.Intent
 import android.location.Location
 import android.net.Uri
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -349,7 +350,9 @@ fun RestList(navController: NavController) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .background(color = Color.White)
                 .padding(16.dp),
+
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(onClick = { navController.navigate("macp") }) {
@@ -385,7 +388,9 @@ fun RestList(navController: NavController) {
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .background(color = Color.White)
+                .fillMaxSize(),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
         ) {
             items(restaurantList, key = { it.id }) { restaurant ->
@@ -423,10 +428,10 @@ fun RestaurantItem(navController: NavController, restaurant: Restaurant, origin:
             modifier = Modifier
                 .weight(3f)
         ) {
-            Text(text = restaurant.name, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            Text(text = restaurant.address, fontSize = 14.sp, color = Color.LightGray)
+            Text(text = restaurant.name, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(text = restaurant.address, fontSize = 14.sp, color = Color.Gray)
             if (distance != null) {
-                Text(text = "Distance: ${"%.2f".format(distance)} km", fontSize = 14.sp, color = Color.LightGray)
+                Text(text = "Distance: ${"%.2f".format(distance)} km", fontSize = 14.sp, color = Color.Gray)
             }
             Text(
                 text = "Price Level: ${getPriceLevelString(restaurant.priceLevel)}",
@@ -453,7 +458,7 @@ fun RestaurantItem(navController: NavController, restaurant: Restaurant, origin:
                         navController.context.startActivity(intent)
                     }
                 },
-                enabled = restaurant.websiteUrl != null
+                //enabled = restaurant.websiteUrl != null
             ) {
                 Text("Menu")
             }
