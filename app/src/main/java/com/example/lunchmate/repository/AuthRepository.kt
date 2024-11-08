@@ -2,7 +2,9 @@ package com.example.lunchmate.repository
 
 import android.app.Activity
 import android.content.Intent
+import android.util.Log
 import com.example.lunchmate.R
+import com.example.lunchmate.ui.screens.chaneloc
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -43,6 +45,8 @@ class AuthRepository(private val activity: Activity) {
                         .addOnSuccessListener { document ->
                             if (document.exists()) {
                                 onUserExists()
+                                chaneloc = document.getString("location") ?: "Unknown Location" // Update location
+                                Log.d("SignInPage", "User location: $chaneloc")
                             } else {
                                 account?.let { onUserDoesNotExist(it) }
                             }
