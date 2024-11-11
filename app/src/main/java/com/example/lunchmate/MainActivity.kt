@@ -38,6 +38,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.example.lunchmate.com.example.lunchmate.ui.screens.SubmitReview
 
 //import com.example.lunchmate.com.example.lunchmate.ui.screens.ReviewPage
 import com.example.lunchmate.ui.screens.CreateEvents
@@ -270,6 +271,9 @@ fun MainAppNavHost(context: Context, shouldNavigateToReview: Boolean, activity: 
         // Add the ReviewPage composable
        composable("reviews") {
             Reviews(navController=navController,userstore) // Navigate back to the previous screen
+        }
+        composable("submit_review") {
+            SubmitReview(navController, userstore)
         }
     }
 
