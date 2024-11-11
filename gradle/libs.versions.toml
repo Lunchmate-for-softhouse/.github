@@ -24,6 +24,7 @@ compilercommon = "3.2.0-alpha11"
 
 composeMaterial = "1.4.0"
 material3AndroidVersion = "1.2.1"
+media3CommonKtx = "1.4.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -55,6 +56,7 @@ androidx-compilercommon = { group = "androidx.databinding", name = "compilerComm
 androidx-compose-material = { group = "androidx.wear.compose", name = "compose-material", version.ref = "composeMaterial" }
 
 material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3AndroidVersion" }
+androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
